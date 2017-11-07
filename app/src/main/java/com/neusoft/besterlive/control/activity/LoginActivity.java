@@ -135,6 +135,7 @@ public class LoginActivity extends Activity {
             public void onSuccess(TIMUserProfile timUserProfile) {
                 //获取用户字段信息成功，将其保存
                 BesterApplication.getApp().saveSelfProfile(timUserProfile);
+
             }
         });
     }
