@@ -19,7 +19,7 @@ import java.util.List;
 
 public class BesterApplication extends Application {
     private static BesterApplication app;
-    private TIMUserProfile mTIMUserProfile;
+    private static TIMUserProfile mTIMUserProfile;
 
     //AK密钥
     private String accessKey = "Z7dCSZ6mSiHVHg_-qMloEjMpL_xv3A7W4fst7wzR";
@@ -60,7 +60,6 @@ public class BesterApplication extends Application {
 
     public static BesterApplication getApp() {
         return app;
-
     }
 
     /**

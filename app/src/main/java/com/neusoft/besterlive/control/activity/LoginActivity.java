@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -20,6 +21,7 @@ import com.tencent.TIMValueCallBack;
 import com.tencent.ilivesdk.ILiveCallBack;
 import com.tencent.ilivesdk.core.ILiveLoginManager;
 
+import static com.neusoft.besterlive.BesterApplication.getApp;
 import static com.neusoft.besterlive.R.id.et_account;
 import static com.neusoft.besterlive.R.id.et_password;
 import static com.tencent.qalsdk.base.a.ac;
@@ -125,16 +127,20 @@ public class LoginActivity extends Activity {
      * 获取用户字段信息
      */
     private void getSelfProfile() {
+        Log.e("TAG","getSelfProfile");
         TIMFriendshipManager.getInstance().getSelfProfile(new TIMValueCallBack<TIMUserProfile>() {
             @Override
             public void onError(int i, String s) {
+                Log.e("TAG","onError");
                 Toast.makeText(LoginActivity.this, "获取用户字段信息失败！错误码：" + i, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onSuccess(TIMUserProfile timUserProfile) {
+                Log.e("TAG","onSuccess");
                 //获取用户字段信息成功，将其保存
                 BesterApplication.getApp().saveSelfProfile(timUserProfile);
+
             }
         });
     }

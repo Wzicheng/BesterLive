@@ -24,17 +24,17 @@ public class ImgUtils {
                 .into(targetView);
     }
 
-    public static void loadRound(String url, ImageView targetView) {
+    public static void loadRound(String url, ImageView targetImg) {
         Glide.with(BesterApplication.getApp().getApplicationContext())
                 .load(url)
                 .bitmapTransform(new CropCircleTransformation(BesterApplication.getApp().getApplicationContext()))
-                .into(targetView);
+                .into(targetImg);
     }
 
-    public static void loadRound(int resId, ImageView targetView) {
+    public static void loadRound(int resId, ImageView targetImg) {
         Glide.with(BesterApplication.getApp().getApplicationContext())
                 .load(resId)
                 .bitmapTransform(new CropCircleTransformation(BesterApplication.getApp().getApplicationContext()))
-                .into(targetView);
+                .into(targetImg);
     }
 }

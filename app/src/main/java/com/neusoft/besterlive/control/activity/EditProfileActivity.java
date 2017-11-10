@@ -1,5 +1,6 @@
 package com.neusoft.besterlive.control.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -21,6 +22,7 @@ import com.neusoft.besterlive.control.view.EditProfileDialog;
 import com.neusoft.besterlive.control.view.TextProfile;
 import com.neusoft.besterlive.model.bean.CustomProfile;
 import com.neusoft.besterlive.utils.ImgUtils;
+import com.neusoft.besterlive.utils.PicChooserHelper;
 import com.tencent.TIMCallBack;
 import com.tencent.TIMFriendGenderType;
 import com.tencent.TIMFriendshipManager;
@@ -28,6 +30,8 @@ import com.tencent.TIMUserProfile;
 import com.tencent.TIMValueCallBack;
 
 import java.util.Map;
+
+import static java.security.AccessController.getContext;
 
 
 /**
@@ -53,7 +57,6 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
-
         findAllViews();
         setTitleBar();
         setIconKey();//设置字段
@@ -65,29 +68,30 @@ public class EditProfileActivity extends AppCompatActivity {
         spe.putBoolean("firstLogin",false);
         spe.commit();
     }
-
     private void updateView() {
         TIMUserProfile myProfile = BesterApplication.getApp().getSelfProfile();
-        if (myProfile == null){
+        if (myProfile != null){
+            String faceUrl = myProfile.getFaceUrl();
+            if (TextUtils.isEmpty(faceUrl)){
+                ImgUtils.loadRound(R.drawable.default_avatar,mAvatarImg);
+            } else {
+                ImgUtils.loadRound(faceUrl,mAvatarImg);
+            }
+            mNickName.setValue(myProfile.getNickName());
+            mGender.setValue(myProfile.getGender().getValue() == 1 ? "男" : "女");
+            mSign.setValue(myProfile.getSelfSignature());
+            mLocation.setValue(myProfile.getLocation());
+            mId.setValue(myProfile.getIdentifier());
+
+            Map<String,byte[]> customInfo = myProfile.getCustomInfo();
+            mRenzhen.setValue(getValue(customInfo, CustomProfile.CUSTOM_RENZHENG,"未知"));
+            mLevel.setValue(getValue(customInfo,CustomProfile.CUSTOM_LEVEL,"1"));
+            mGet.setValue(getValue(customInfo,CustomProfile.CUSTOM_GET,"0"));
+            mSend.setValue(getValue(customInfo,CustomProfile.CUSTOM_SEND,"0"));
+        } else{
             getSelfInfo();
         }
-        String faceUrl = myProfile.getFaceUrl();
-        if (TextUtils.isEmpty(faceUrl)){
-            ImgUtils.loadRound(R.drawable.default_avatar,mAvatarImg);
-        } else {
-            ImgUtils.loadRound(faceUrl,mAvatarImg);
-        }
-        mNickName.setValue(myProfile.getNickName());
-        mGender.setValue(myProfile.getGender().getValue() == 1 ? "男" : "女");
-        mSign.setValue(myProfile.getSelfSignature());
-        mLocation.setValue(myProfile.getLocation());
-        mId.setValue(myProfile.getIdentifier());
 
-        Map<String,byte[]> customInfo = myProfile.getCustomInfo();
-        mRenzhen.setValue(getValue(customInfo, CustomProfile.CUSTOM_RENZHENG,"未知"));
-        mLevel.setValue(getValue(customInfo,CustomProfile.CUSTOM_LEVEL,"1"));
-        mGet.setValue(getValue(customInfo,CustomProfile.CUSTOM_GET,"0"));
-        mSend.setValue(getValue(customInfo,CustomProfile.CUSTOM_SEND,"0"));
     }
 
     private void getSelfInfo() {
@@ -132,6 +136,7 @@ public class EditProfileActivity extends AppCompatActivity {
         mTitleBarEditProfile.setTitle("编辑个人信息");
         mTitleBarEditProfile.setTitleTextColor(Color.WHITE);
         setSupportActionBar(mTitleBarEditProfile);
+
     }
 
     private void findAllViews() {
@@ -164,7 +169,7 @@ public class EditProfileActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.avatar_view:
-//                    showEditAvatar();
+                    showEditAvatar();
                     break;
                 case R.id.nick_name:
                     showEditNickNameDialog();
@@ -188,6 +193,35 @@ public class EditProfileActivity extends AppCompatActivity {
                     break;
             }
         }
+    }
+
+    private PicChooserHelper picChooseHelper;
+    private void showEditAvatar() {
+        picChooseHelper = new PicChooserHelper(this);
+        picChooseHelper.setOnUpdateListener(new PicChooserHelper.OnUpdateListener() {
+            @Override
+            public void onSuccess(String url) {
+                //更新头像信息
+                TIMFriendshipManager.getInstance().setFaceUrl(url, new TIMCallBack() {
+                    @Override
+                    public void onError(int i, String s) {
+                        Toast.makeText(EditProfileActivity.this, "更新头像失败" + s, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(EditProfileActivity.this, "更新头像成功" , Toast.LENGTH_SHORT).show();
+                        getSelfInfo();
+                    }
+                });
+            }
+
+            @Override
+            public void onFail() {
+                Toast.makeText(EditProfileActivity.this, "更新头像失败" , Toast.LENGTH_SHORT).show();
+            }
+        });
+        picChooseHelper.showPicChooserDialog();
     }
 
     private void showEditLocationDialog() {
@@ -294,5 +328,14 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         });
         dialog.show("昵称", R.drawable.ic_info_nickname, mNickName.getValue());
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (picChooseHelper != null){
+            picChooseHelper.onActivityResult(requestCode,resultCode,data);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

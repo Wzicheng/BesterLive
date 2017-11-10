@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         TabHost.TabSpec liveListTabSpec = mFragmentTab.newTabSpec("liveList").setIndicator(getIndicatorView(R.drawable.tab_livelist));
         mFragmentTab.addTab(liveListTabSpec, LiveListFragment.class,null);
         //创建直播
-        TabHost.TabSpec createLiveTabSpec = mFragmentTab.newTabSpec("create").setIndicator(getIndicatorView(R.drawable.tab_publish_live));
+        TabHost.TabSpec createLiveTabSpec = mFragmentTab.newTabSpec("createLive").setIndicator(getIndicatorView(R.drawable.tab_publish_live));
         mFragmentTab.addTab(createLiveTabSpec,null,null);
 
         //个人信息设置页面
