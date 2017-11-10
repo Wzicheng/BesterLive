@@ -4,92 +4,24 @@
     android:layout_width="match_parent"
     android:background="@android:color/white"
     android:layout_height="match_parent">
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/title_bar_edit_profile"
+
+    <fragment
+        android:id="@+id/fragment_editInfo"
+        android:name="com.neusoft.besterlive.control.fragment.EditProfileFragment"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorFullRed" />
-    <ScrollView
+        android:layout_height="match_parent"
+        android:layout_weight="1"/>
+    <Button
+        android:id="@+id/btn_finish"
+        android:background="@drawable/btn_bg_red_round_corner"
+        android:text="@string/btn_text_finish"
+        android:textSize="18sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:textColor="@color/colorAccent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <LinearLayout
-                android:id="@+id/avatar_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:layout_margin="5dp">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_info_avatar" />
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_weight="1"
-                    android:text="@string/text_avatar"
-                    android:textSize="20sp"
-                    android:textColor="#333" />
-                <ImageView
-                    android:id="@+id/avatar_img"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:layout_marginLeft="5dp" />
-            </LinearLayout>
-            <com.neusoft.besterlive.control.view.EditProfile
-                android:id="@+id/nick_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.EditProfile
-                android:id="@+id/gender"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.EditProfile
-                android:id="@+id/sign"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.EditProfile
-                android:id="@+id/renzhen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.EditProfile
-                android:id="@+id/location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1px"
-                android:background="#333" />
-            <com.neusoft.besterlive.control.view.TextProfile
-                android:id="@+id/id"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.TextProfile
-                android:id="@+id/level"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.TextProfile
-                android:id="@+id/get"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.TextProfile
-                android:id="@+id/send"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <Button
-                android:id="@+id/btn_finish"
-                android:background="@drawable/btn_bg_red_round_corner"
-                android:text="@string/btn_text_finish"
-                android:textSize="18sp"
-                android:textColor="@color/colorAccent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-    </ScrollView>
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

@@ -56,12 +56,12 @@ public class EditProfileFragment extends Fragment{
     private TextProfile mLevel;
     private TextProfile mGet;
     private TextProfile mSend;
-    private Button mBtnFinish;
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_profile,container,false);
-
         findAllViews(view);
         setTitleBar();
         setIconKey();//设置字段
@@ -75,7 +75,6 @@ public class EditProfileFragment extends Fragment{
 
         return view;
     }
-
     private void updateView() {
         TIMUserProfile myProfile = BesterApplication.getApp().getSelfProfile();
         if (myProfile != null){
@@ -162,7 +161,7 @@ public class EditProfileFragment extends Fragment{
         mLevel = (TextProfile) view.findViewById(R.id.level);
         mGet = (TextProfile) view.findViewById(R.id.get);
         mSend = (TextProfile) view.findViewById(R.id.send);
-        mBtnFinish = (Button) view.findViewById(R.id.btn_finish);
+
 
         //设置监听
         mAvatarView.setOnClickListener(new MyOnClickListener());
@@ -171,7 +170,7 @@ public class EditProfileFragment extends Fragment{
         mSign.setOnClickListener(new MyOnClickListener());
         mRenzhen.setOnClickListener(new MyOnClickListener());
         mLocation.setOnClickListener(new MyOnClickListener());
-        mBtnFinish.setOnClickListener(new MyOnClickListener());
+
     }
 
     private class MyOnClickListener implements View.OnClickListener {
@@ -196,18 +195,13 @@ public class EditProfileFragment extends Fragment{
                 case R.id.location:
                     showEditLocationDialog();
                     break;
-                case R.id.btn_finish:
-                    Intent intent = new Intent(getContext(),MainActivity.class);
-                    startActivity(intent);
-                    getActivity().finish();
-                    break;
             }
         }
     }
 
     private PicChooserHelper picChooseHelper;
     private void showEditAvatar() {
-        picChooseHelper = new PicChooserHelper(getActivity());
+        picChooseHelper = new PicChooserHelper(this);
         picChooseHelper.setOnUpdateListener(new PicChooserHelper.OnUpdateListener() {
             @Override
             public void onSuccess(String url) {

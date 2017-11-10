@@ -80,14 +80,7 @@
                 android:id="@+id/send"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <Button
-                android:id="@+id/btn_finish"
-                android:background="@drawable/btn_bg_red_round_corner"
-                android:text="@string/btn_text_finish"
-                android:textSize="18sp"
-                android:textColor="@color/colorAccent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

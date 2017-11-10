@@ -32,13 +32,21 @@ public class PicChooserHelper {
     private static final int FROM_ALBUM = 1;
     private static final int FROM_CAMERA = 2;
     private Activity mActivity;
+    private Fragment mFragment;
 
     public PicChooserHelper(Activity activity) {
         mActivity = activity;
     }
+    public PicChooserHelper(Fragment fragment) {
+        mFragment = fragment;
+    }
+
 
     public void showPicChooserDialog() {
         Activity activity = mActivity;
+        if (activity == null){
+            activity = mFragment.getActivity();
+        }
         PicChooseDialog dialog = new PicChooseDialog(activity);
         dialog.setOnDialogClickListener(new PicChooseDialog.OnDialogClickListener() {
             @Override
@@ -70,7 +78,12 @@ public class PicChooserHelper {
                 Uri uri = convertUri(cameraPicUri);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,uri);
             }
-            mActivity.startActivityForResult(cameraIntent,FROM_CAMERA);
+            if (mFragment == null){
+                mActivity.startActivityForResult(cameraIntent,FROM_CAMERA);
+            } else {
+                mFragment.startActivityForResult(cameraIntent,FROM_CAMERA);
+            }
+
         }
     }
 
@@ -80,7 +93,9 @@ public class PicChooserHelper {
         } else {
             String filePath = cameraPicUri.getPath();
             Activity activity = mActivity;
-
+            if (activity == null){
+                activity = mFragment.getActivity();
+            }
             Cursor cursor = activity.getContentResolver().query(
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     new String[]{MediaStore.Images.Media._ID},
@@ -100,7 +115,9 @@ public class PicChooserHelper {
 
     private Uri createCameraPicUri() {
         Activity activity  = mActivity;
-
+        if (activity == null){
+            activity = mFragment.getActivity();
+        }
         String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
                 + activity.getApplication().getApplicationInfo().packageName;
         File file = new File(dir);
@@ -122,7 +139,11 @@ public class PicChooserHelper {
     private void choosePicFromAlbum() {
         Intent intent = new Intent("android.intent.action.GET_CONTENT");
         intent.setType("image/*");
-        mActivity.startActivityForResult(intent, FROM_ALBUM);
+        if (mFragment == null){
+            mActivity.startActivityForResult(intent, FROM_ALBUM);
+        } else {
+            mFragment.startActivityForResult(intent,FROM_ALBUM);
+        }
     }
 
 
@@ -167,12 +188,16 @@ public class PicChooserHelper {
         }
         cropUri = getCropUri();
         intent.putExtra(MediaStore.EXTRA_OUTPUT, cropUri);
-        mActivity.startActivityForResult(intent,FROM_CROP);
+        if (mFragment == null){
+            mActivity.startActivityForResult(intent,FROM_CROP);
+        } else {
+            mFragment.startActivityForResult(intent,FROM_CROP);
+        }
     }
 
     private Uri getCropUri() {
         String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
-                + mActivity.getApplication().getPackageName();
+                + mFragment.getActivity().getApplication().getPackageName();
         File dir = new File(dirPath);
         if (!dir.exists() || dir.isFile()){
             dir.mkdir();
