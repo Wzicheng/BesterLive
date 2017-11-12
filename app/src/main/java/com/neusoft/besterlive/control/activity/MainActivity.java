@@ -1,5 +1,6 @@
 package com.neusoft.besterlive.control.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
@@ -43,7 +44,8 @@ public class MainActivity extends AppCompatActivity {
         mFragmentTab.getTabWidget().getChildTabViewAt(1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(MainActivity.this,CreateLiveActivity.class);
+                startActivity(intent);
             }
         });
     }

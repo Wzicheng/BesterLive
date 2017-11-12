@@ -33,12 +33,19 @@ public class PicChooserHelper {
     private static final int FROM_CAMERA = 2;
     private Activity mActivity;
     private Fragment mFragment;
+    private PicType mPicType;
 
-    public PicChooserHelper(Activity activity) {
-        mActivity = activity;
+    public enum PicType{
+        Avatar,Cover
     }
-    public PicChooserHelper(Fragment fragment) {
+
+    public PicChooserHelper(Activity activity,PicType picType) {
+        mActivity = activity;
+        mPicType = picType;
+    }
+    public PicChooserHelper(Fragment fragment,PicType picType) {
         mFragment = fragment;
+        mPicType = picType;
     }
 
 
@@ -126,7 +133,12 @@ public class PicChooserHelper {
         }
         TIMUserProfile userProfile = BesterApplication.getApp().getSelfProfile();
         if (userProfile != null){
-            String picName = userProfile.getIdentifier()+".jpg";
+            String picName = userProfile.getIdentifier();
+            if (mPicType == PicType.Avatar){
+                picName += "_avatar.jpg";
+            } else if (mPicType == PicType.Cover){
+                picName += "_cover.jpg";
+            }
             File picFile = new File(dir,picName);
             if (picFile.exists()){
                 picFile.delete();
@@ -173,10 +185,17 @@ public class PicChooserHelper {
         intent.setDataAndType(uri, "image/*");
 
         //设置输入大小和输出大小
-        intent.putExtra("aspectX", 300);
-        intent.putExtra("aspectX", 300);
-        intent.putExtra("ourputX", 300);
-        intent.putExtra("outputX", 300);
+        if (mPicType == PicType.Avatar){
+            intent.putExtra("aspectX", 300);
+            intent.putExtra("aspectY", 300);
+            intent.putExtra("ourputX", 300);
+            intent.putExtra("outputY", 300);
+        } else if (mPicType == PicType.Cover){
+            intent.putExtra("aspectX", 500);
+            intent.putExtra("aspectY", 300);
+            intent.putExtra("ourputX", 500);
+            intent.putExtra("outputY", 300);
+        }
         int currentApiVersion = Build.VERSION.SDK_INT;
         if (currentApiVersion < 24){
             //小于7.0版本
@@ -196,8 +215,12 @@ public class PicChooserHelper {
     }
 
     private Uri getCropUri() {
+        Activity activity  = mActivity;
+        if (activity == null){
+            activity = mFragment.getActivity();
+        }
         String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
-                + mFragment.getActivity().getApplication().getPackageName();
+                + activity.getApplication().getPackageName();
         File dir = new File(dirPath);
         if (!dir.exists() || dir.isFile()){
             dir.mkdir();
@@ -206,7 +229,12 @@ public class PicChooserHelper {
         TIMUserProfile selfProFile = BesterApplication.getApp().getSelfProfile();
         String fileName = "";
         if (selfProFile != null){
-            fileName = selfProFile.getIdentifier() + "_" + System.currentTimeMillis() + "_avatar_crop.jpg";
+            fileName = selfProFile.getIdentifier() + "_" ;
+            if (mPicType == PicType.Avatar){
+                fileName += System.currentTimeMillis() + "_avatar_crop.jpg";
+            } else if (mPicType == PicType.Cover){
+                fileName += System.currentTimeMillis() + "_cover_crop.jpg";
+            }
         }
         File jpgFile = new File(dir,fileName);
         if (jpgFile.exists()){

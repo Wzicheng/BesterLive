@@ -13,15 +13,12 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.neusoft.besterlive.BesterApplication;
 import com.neusoft.besterlive.R;
-import com.neusoft.besterlive.control.activity.EditProfileActivity;
-import com.neusoft.besterlive.control.activity.MainActivity;
 import com.neusoft.besterlive.control.view.EditGenderDialog;
 import com.neusoft.besterlive.control.view.EditProfile;
 import com.neusoft.besterlive.control.view.EditProfileDialog;
@@ -201,7 +198,7 @@ public class EditProfileFragment extends Fragment{
 
     private PicChooserHelper picChooseHelper;
     private void showEditAvatar() {
-        picChooseHelper = new PicChooserHelper(this);
+        picChooseHelper = new PicChooserHelper(this, PicChooserHelper.PicType.Avatar);
         picChooseHelper.setOnUpdateListener(new PicChooserHelper.OnUpdateListener() {
             @Override
             public void onSuccess(String url) {
