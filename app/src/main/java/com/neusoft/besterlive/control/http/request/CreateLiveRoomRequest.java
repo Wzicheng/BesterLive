@@ -1,5 +1,6 @@
-package com.neusoft.besterlive.control.http;
+package com.neusoft.besterlive.control.http.request;
 
+import com.neusoft.besterlive.control.http.response.CreateLiveRoomResponseObject;
 import com.neusoft.besterlive.utils.BaseRequest;
 
 /**
@@ -7,7 +8,7 @@ import com.neusoft.besterlive.utils.BaseRequest;
  */
 
 public class CreateLiveRoomRequest extends BaseRequest {
-    private static final String host = "http://besterlive.butterfly.mopaasapp.com/roomServlet?";
+    private static final String host = "http://besterlive.butterfly.mopaasapp.com/roomServlet?action=createLiveRoom&";
 
     public static class CreateLiveRoomParam{
         public String userId;
@@ -24,7 +25,7 @@ public class CreateLiveRoomRequest extends BaseRequest {
 
         @Override
         public String toString() {
-            return Param_User_id + "=" + userId +
+            return  Param_User_id + "=" + userId +
                     "&" + Param_User_name + "=" + userName +
                     "&" + Param_User_avatar + "=" + userAvatar +
                     "&" + Param_Live_cover + "=" + liveCover +

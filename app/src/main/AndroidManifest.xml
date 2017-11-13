@@ -25,6 +25,7 @@
         <activity android:name=".control.activity.RegisterActivity"></activity>
         <activity android:name=".control.activity.EditProfileActivity"></activity>
         <activity android:name=".control.activity.CreateLiveActivity"></activity>
+        <activity android:name=".control.activity.WatcherLiveActivity"></activity>
     </application>
 
 </manifest>

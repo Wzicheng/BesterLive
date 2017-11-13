@@ -1,4 +1,4 @@
-package com.neusoft.besterlive.control.http;
+package com.neusoft.besterlive.control.http.response;
 
 import com.neusoft.besterlive.model.bean.ResponseObject;
 import com.neusoft.besterlive.model.bean.RoomInfo;

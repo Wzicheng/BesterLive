@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.neusoft.besterlive.BesterApplication;
 import com.neusoft.besterlive.R;
-import com.neusoft.besterlive.control.http.CreateLiveRoomRequest;
+import com.neusoft.besterlive.control.http.request.CreateLiveRoomRequest;
 import com.neusoft.besterlive.model.bean.RoomInfo;
 import com.neusoft.besterlive.utils.BaseRequest;
 import com.neusoft.besterlive.utils.ImgUtils;
