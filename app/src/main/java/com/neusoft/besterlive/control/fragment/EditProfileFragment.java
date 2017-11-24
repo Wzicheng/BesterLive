@@ -114,7 +114,7 @@ public class EditProfileFragment extends Fragment{
         });
     }
 
-    private String getValue(Map<String, byte[]> customInfo, String key, String defaultValue) {
+    public static String getValue(Map<String, byte[]> customInfo, String key, String defaultValue) {
         if (customInfo != null){
             byte[] valueBytes = customInfo.get(key);
             if (valueBytes != null){

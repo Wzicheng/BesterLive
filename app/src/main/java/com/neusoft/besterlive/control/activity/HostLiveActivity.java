@@ -23,6 +23,8 @@ import com.tencent.TIMMessage;
 import com.tencent.TIMUserProfile;
 import com.tencent.av.sdk.AVRoomMulti;
 import com.tencent.ilivesdk.ILiveCallBack;
+import com.tencent.ilivesdk.ILiveConstants;
+import com.tencent.ilivesdk.core.ILiveLoginManager;
 import com.tencent.ilivesdk.view.AVRootView;
 import com.tencent.livesdk.ILVCustomCmd;
 import com.tencent.livesdk.ILVLiveConfig;
@@ -30,59 +32,53 @@ import com.tencent.livesdk.ILVLiveManager;
 import com.tencent.livesdk.ILVLiveRoomOption;
 import com.tencent.livesdk.ILVText;
 
-import static android.R.id.message;
-
 /**
- * Created by Wzich on 2017/11/12.
+ * Created by Wzich on 2017/11/13.
  */
 
-public class WatcherLiveActivity extends AppCompatActivity {
+public class HostLiveActivity extends AppCompatActivity {
     private SizeChangeRelativeLayout mActivityHostLive;
     private AVRootView mLiveView;
     private BottomControlView mBottomControlView;
     private MsgListView mMsgListView;
     private DanMuView mDanMuView;
+
     private ChatView mChatView;
     private int roomId;
-    private String userId;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_watch_live);
+        setContentView(R.layout.activity_host_live);
         initView();
-        joinRoom();
+        createRoom();
     }
 
-    private void joinRoom() {
+    private void createRoom() {
         roomId = getIntent().getIntExtra("roomId",-1);
         if (roomId < 0){
-            Toast.makeText(this, "房间号异常", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getApplicationContext(), "房间ID异常", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-        final String hostId = getIntent().getStringExtra("hostId");
-        //加入房间配置项
-        ILVLiveRoomOption memberOption = new ILVLiveRoomOption(hostId)
-                .controlRole("Guest")   //设置角色
-                .autoCamera(false) //是否自动打开摄像头
-                .authBits(AVRoomMulti.AUTH_BITS_JOIN_ROOM | AVRoomMulti.AUTH_BITS_RECV_AUDIO
-                    | AVRoomMulti.AUTH_BITS_RECV_CAMERA_VIDEO | AVRoomMulti.AUTH_BITS_RECV_SCREEN_VIDEO)//设置权限
-                .videoRecvMode(AVRoomMulti.VIDEO_RECV_MODE_SEMI_AUTO_RECV_CAMERA_VIDEO)//是否开始半自动接收
-                .autoMic(false);//是否自动打开mic
 
-        ILVLiveManager.getInstance().joinRoom(roomId, memberOption, new ILiveCallBack() {
+        //创建房间配置项
+        ILVLiveRoomOption hostOption = new ILVLiveRoomOption(ILiveLoginManager.getInstance().getMyUserId())
+                .controlRole("LiveMaster")//角色设置
+                .autoFocus(true)
+                .authBits(AVRoomMulti.AUTH_BITS_DEFAULT)//权限设置
+                .cameraId(ILiveConstants.FRONT_CAMERA)//设置前后置摄像头
+                .videoRecvMode(AVRoomMulti.VIDEO_RECV_MODE_SEMI_AUTO_RECV_CAMERA_VIDEO);//是否开始半自动接受
+
+        //创建直播房间
+        ILVLiveManager.getInstance().createRoom(roomId, hostOption, new ILiveCallBack() {
             @Override
             public void onSuccess(Object data) {
-                //加入房间成功
-                Toast.makeText(WatcherLiveActivity.this, "加入房间成功", Toast.LENGTH_SHORT).show();
 
             }
 
             @Override
             public void onError(String module, int errCode, String errMsg) {
-                //加入房间失败
-                Toast.makeText(WatcherLiveActivity.this, "加入房间失败", Toast.LENGTH_SHORT).show();
+
             }
         });
     }
@@ -103,9 +99,6 @@ public class WatcherLiveActivity extends AppCompatActivity {
             }
         });
 
-        //弹幕显示部分
-        mDanMuView = (DanMuView) findViewById(R.id.danmu_view);
-
         //视频直播窗口
         mLiveView = (AVRootView) findViewById(R.id.live_view);
 
@@ -121,17 +114,17 @@ public class WatcherLiveActivity extends AppCompatActivity {
             public void onNewCustomMsg(ILVCustomCmd cmd, String id, TIMUserProfile userProfile) {
                 MsgInfo msgInfo = getMsgInfo(cmd, userProfile);
                 switch (cmd.getCmd()){
-                    case IMConstants.CMD_MSG_LIST: //来自信息
-                        mMsgListView.addMsg(msgInfo);
-                        break;
+                   case IMConstants.CMD_MSG_LIST: //来自信息
+                       mMsgListView.addMsg(msgInfo);
+                       break;
 
-                    case IMConstants.CMD_MSG_DANMU: //来自弹幕
-                        mMsgListView.addMsg(msgInfo);
-                        mDanMuView.showMsgDanMu(msgInfo);
-                        break;
+                   case IMConstants.CMD_MSG_DANMU: //来自弹幕
+                       mMsgListView.addMsg(msgInfo);
+                       mDanMuView.showMsgDanMu(msgInfo);
+                       break;
 
-                    case IMConstants.CMD_MGS_GIFT: //来自礼物
-                        break;
+                   case IMConstants.CMD_MGS_GIFT: //来自礼物
+                       break;
                 }
             }
 
@@ -143,6 +136,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
 
         //弹幕显示部分
         mDanMuView = (DanMuView) findViewById(R.id.danmu_view);
+
         //消息显示窗口
         mMsgListView = (MsgListView) findViewById(R.id.msg_list_view);
 
@@ -246,16 +240,15 @@ public class WatcherLiveActivity extends AppCompatActivity {
     }
 
     private void quitRoom() {
-        //退出房间
         ILVLiveManager.getInstance().quitRoom(new ILiveCallBack() {
             @Override
             public void onSuccess(Object data) {
-                Toast.makeText(WatcherLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(HostLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(String module, int errCode, String errMsg) {
-                Toast.makeText(WatcherLiveActivity.this, "退出房间失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(HostLiveActivity.this, "退出房间失败", Toast.LENGTH_SHORT).show();
             }
         });
     }

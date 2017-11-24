@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -83,24 +84,32 @@ public class CreateLiveActivity extends AppCompatActivity {
         CreateLiveRoomRequest request = new CreateLiveRoomRequest();
         CreateLiveRoomRequest.CreateLiveRoomParam param = new CreateLiveRoomRequest.CreateLiveRoomParam();
         TIMUserProfile selfProfile = BesterApplication.getApp().getSelfProfile();
-        param.userId = selfProfile.getIdentifier();
-        param.userName = selfProfile.getNickName();
-        param.userAvatar = selfProfile.getFaceUrl();
-        param.liveTitle = mTitle.getText().toString();
-        param.liveCover = coverUrl;
-        request.setOnResultListener(new BaseRequest.OnResultListener<RoomInfo>() {
-            @Override
-            public void onFail(int code, String msg) {
-                Toast.makeText(CreateLiveActivity.this, "创建失败：" + msg, Toast.LENGTH_SHORT).show();
-            }
+        if (selfProfile != null){
+            param.userId = selfProfile.getIdentifier();
+            param.userName = selfProfile.getNickName();
+            param.userAvatar = selfProfile.getFaceUrl();
+            param.liveTitle = mTitle.getText().toString();
+            param.liveCover = coverUrl;
+            request.setOnResultListener(new BaseRequest.OnResultListener<RoomInfo>() {
+                @Override
+                public void onFail(int code, String msg) {
+                    Toast.makeText(CreateLiveActivity.this, "创建失败：" + msg, Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onSuccess(RoomInfo data) {
-                Toast.makeText(CreateLiveActivity.this, "创建成功：" + data.userId, Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onSuccess(RoomInfo roomInfo) {
+                    Intent intent = new Intent(CreateLiveActivity.this,HostLiveActivity.class);
+                    intent.putExtra("roomId",roomInfo.roomId);
+                    startActivity(intent);
+                    finish();
+                }
+            });
 
-        request.request(param);
+            request.request(param);
+        } else {
+            Log.e("TAG","null");
+        }
+
     }
 
     private PicChooserHelper picChooserHelper;

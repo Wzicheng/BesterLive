@@ -54,6 +54,7 @@ public class LiveListFragment extends Fragment {
             @Override
             public void onFail(int code, String msg) {
                 Toast.makeText(LiveListFragment.this.getActivity(), "请求失败：" + msg, Toast.LENGTH_SHORT).show();
+                mSwipeRefreshLayout.setRefreshing(false);
             }
 
             @Override

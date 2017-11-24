@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.neusoft.besterlive.control.view.SizeChangeRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_host_live"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <com.tencent.ilivesdk.view.AVRootView
+        android:id="@+id/live_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"/>
+    <com.neusoft.besterlive.control.view.BottomControlView
+        android:id="@+id/bottom_control_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        />
+
+    <com.neusoft.besterlive.control.view.ChatView
+        android:id="@+id/bottom_chat_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        />
+    
+    <com.neusoft.besterlive.control.view.MsgListView
+        android:id="@+id/msg_list_view"
+        android:padding="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:layout_above="@id/bottom_chat_view"/>
+
+    <com.neusoft.besterlive.control.view.DanMuView
+        android:id="@+id/danmu_view"
+        android:layout_above="@id/msg_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </com.neusoft.besterlive.control.view.DanMuView>
+
+
+</com.neusoft.besterlive.control.view.SizeChangeRelativeLayout>

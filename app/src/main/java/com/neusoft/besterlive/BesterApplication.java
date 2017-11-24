@@ -20,6 +20,7 @@ import java.util.List;
 public class BesterApplication extends Application {
     private static BesterApplication app;
     private static TIMUserProfile mTIMUserProfile;
+    private static ILVLiveConfig liveConfig;
 
     //AK密钥
     private String accessKey = "Z7dCSZ6mSiHVHg_-qMloEjMpL_xv3A7W4fst7wzR";
@@ -45,7 +46,7 @@ public class BesterApplication extends Application {
     private void initLiveSdk() {
         //初始化SDK
         ILiveSDK.getInstance().initSdk(this, 1400046908, 18599);
-        ILVLiveConfig liveConfig = new ILVLiveConfig();
+        liveConfig = new ILVLiveConfig();
         //初始化直播场景
         ILVLiveManager.getInstance().init(liveConfig);
 
@@ -72,5 +73,9 @@ public class BesterApplication extends Application {
 
     public TIMUserProfile getSelfProfile(){
          return mTIMUserProfile;
+    }
+
+    public ILVLiveConfig getLiveConfig(){
+        return liveConfig;
     }
 }

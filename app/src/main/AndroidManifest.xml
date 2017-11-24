@@ -25,7 +25,10 @@
         <activity android:name=".control.activity.RegisterActivity"></activity>
         <activity android:name=".control.activity.EditProfileActivity"></activity>
         <activity android:name=".control.activity.CreateLiveActivity"></activity>
-        <activity android:name=".control.activity.WatcherLiveActivity"></activity>
+        <activity android:name=".control.activity.HostLiveActivity"
+            android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".control.activity.WatcherLiveActivity"
+            android:windowSoftInputMode="adjustResize"></activity>
     </application>
 
 </manifest>

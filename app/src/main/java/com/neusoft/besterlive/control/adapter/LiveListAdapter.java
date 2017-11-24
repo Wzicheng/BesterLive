@@ -105,7 +105,7 @@ public class LiveListAdapter extends BaseAdapter {
             if (TextUtils.isEmpty(avatar)){
                 ImgUtils.loadRound(R.drawable.default_avatar,mHostAvatar);
             } else {
-                ImgUtils.load(avatar,mHostAvatar);
+                ImgUtils.loadRound(avatar,mHostAvatar);
             }
 
             int watcherNums = roomInfo.watcherNums;
