@@ -16,6 +16,8 @@ import com.neusoft.besterlive.R;
 public class BottomControlView extends RelativeLayout {
     private ImageView mClose;
     private ImageView mChat;
+    private ImageView mGift;
+    private ImageView mOperate;
 
     public BottomControlView(Context context) {
         super(context);
@@ -40,39 +42,57 @@ public class BottomControlView extends RelativeLayout {
     private void findAllView() {
         mClose = (ImageView) findViewById(R.id.close);
         mChat = (ImageView) findViewById(R.id.chat);
+        mGift = (ImageView) findViewById(R.id.gift);
+//        mOperate = (ImageView) findViewById(R.id.operate);
 
         mClose.setOnClickListener(new MyOnClickListener());
         mChat.setOnClickListener(new MyOnClickListener());
-
+        mGift.setOnClickListener(new MyOnClickListener());
+//        mOperate.setOnClickListener(new MyOnClickListener());
     }
 
     private class MyOnClickListener implements OnClickListener {
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.close:
-                    if (mOnControlClickListener != null){
+                    if (mOnControlClickListener != null) {
                         mOnControlClickListener.onCloseClick();
                     }
-
                     break;
                 case R.id.chat:
-                    if (mOnControlClickListener != null){
+                    if (mOnControlClickListener != null) {
                         mOnControlClickListener.onChatClick();
                     }
                     break;
+                case R.id.gift:
+                    if (mOnControlClickListener != null) {
+                        mOnControlClickListener.onGiftClick();
+                    }
+                    break;
+//                case R.id.operate:
+//                    if (mOnControlClickListener != null) {
+//                        mOnControlClickListener.onOperateClick();
+//                    }
+//                    break;
             }
 
         }
     }
 
     private OnControlClickListener mOnControlClickListener;
-    public void setOnControlClickListener(OnControlClickListener listener){
+
+    public void setOnControlClickListener(OnControlClickListener listener) {
         mOnControlClickListener = listener;
     }
 
-    public interface OnControlClickListener{
+    public interface OnControlClickListener {
         void onCloseClick();
+
         void onChatClick();
+
+        void onGiftClick();
+
+//        void onOperateClick();
     }
 }

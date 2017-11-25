@@ -14,6 +14,7 @@ import com.neusoft.besterlive.control.fragment.EditProfileFragment;
 import com.neusoft.besterlive.control.view.BottomControlView;
 import com.neusoft.besterlive.control.view.ChatView;
 import com.neusoft.besterlive.control.view.DanMuView;
+import com.neusoft.besterlive.control.view.GiftSelectDialog;
 import com.neusoft.besterlive.control.view.MsgListView;
 import com.neusoft.besterlive.control.view.SizeChangeRelativeLayout;
 import com.neusoft.besterlive.model.bean.CustomProfile;
@@ -154,6 +155,13 @@ public class HostLiveActivity extends AppCompatActivity {
                 //显示聊天操作栏
                 mBottomControlView.setVisibility(View.INVISIBLE);
                 mChatView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onGiftClick() {
+                mBottomControlView.setVisibility(View.INVISIBLE);
+                GiftSelectDialog giftSelectDialog = new GiftSelectDialog(HostLiveActivity.this);
+                giftSelectDialog.show();
             }
         });
 

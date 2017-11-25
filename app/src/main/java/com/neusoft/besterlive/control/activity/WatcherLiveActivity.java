@@ -1,24 +1,31 @@
 package com.neusoft.besterlive.control.activity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.neusoft.besterlive.BesterApplication;
 import com.neusoft.besterlive.R;
 import com.neusoft.besterlive.control.fragment.EditProfileFragment;
 import com.neusoft.besterlive.control.view.BottomControlView;
 import com.neusoft.besterlive.control.view.ChatView;
 import com.neusoft.besterlive.control.view.DanMuView;
+import com.neusoft.besterlive.control.view.GiftRepeatView;
+import com.neusoft.besterlive.control.view.GiftSelectDialog;
 import com.neusoft.besterlive.control.view.MsgListView;
 import com.neusoft.besterlive.control.view.SizeChangeRelativeLayout;
 import com.neusoft.besterlive.model.bean.CustomProfile;
+import com.neusoft.besterlive.model.bean.GiftInfo;
 import com.neusoft.besterlive.model.bean.IMConstants;
 import com.neusoft.besterlive.model.bean.MsgInfo;
+import com.neusoft.besterlive.utils.LogUtil;
 import com.tencent.TIMMessage;
 import com.tencent.TIMUserProfile;
 import com.tencent.av.sdk.AVRoomMulti;
@@ -41,6 +48,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
     private AVRootView mLiveView;
     private BottomControlView mBottomControlView;
     private MsgListView mMsgListView;
+    private GiftRepeatView mGiftView;
     private DanMuView mDanMuView;
     private ChatView mChatView;
     private int roomId;
@@ -89,7 +97,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
 
     private void initView() {
         //对整个RelativeLayout进行监听
-        mActivityHostLive = (SizeChangeRelativeLayout) findViewById(R.id.activity_host_live);
+        mActivityHostLive = (SizeChangeRelativeLayout) findViewById(R.id.activity_watch_live);
         mActivityHostLive.setOnKeyBoardStatusListener(new SizeChangeRelativeLayout.OnKeyBoardStatusListener() {
             @Override
             public void onShow() {
@@ -102,6 +110,9 @@ public class WatcherLiveActivity extends AppCompatActivity {
                 mChatView.setVisibility(View.INVISIBLE);
             }
         });
+
+        //礼物显示部分
+        mGiftView = (GiftRepeatView) findViewById(R.id.gift_view);
 
         //弹幕显示部分
         mDanMuView = (DanMuView) findViewById(R.id.danmu_view);
@@ -119,19 +130,28 @@ public class WatcherLiveActivity extends AppCompatActivity {
 
             @Override
             public void onNewCustomMsg(ILVCustomCmd cmd, String id, TIMUserProfile userProfile) {
-                MsgInfo msgInfo = getMsgInfo(cmd, userProfile);
+
                 switch (cmd.getCmd()){
                     case IMConstants.CMD_MSG_LIST: //来自信息
+                        MsgInfo msgInfo = getMsgInfo(cmd, userProfile);
                         mMsgListView.addMsg(msgInfo);
                         break;
 
                     case IMConstants.CMD_MSG_DANMU: //来自弹幕
-                        mMsgListView.addMsg(msgInfo);
-                        mDanMuView.showMsgDanMu(msgInfo);
+                        MsgInfo msgDanmuInfo = getMsgInfo(cmd, userProfile);
+                        mMsgListView.addMsg(msgDanmuInfo);
+                        mDanMuView.showMsgDanMu(msgDanmuInfo);
                         break;
 
                     case IMConstants.CMD_MGS_GIFT: //来自礼物
-                        break;
+                        //TODO 显示动画
+                       GiftSelectDialog.GiftCmdInfo cmdInfo = new Gson().fromJson(cmd.getParam()
+                            ,GiftSelectDialog.GiftCmdInfo.class);
+                        if (cmdInfo == null){
+                            return;
+                        }
+                        GiftInfo giftInfo = GiftInfo.getGiftById(cmdInfo.giftId);
+                        mGiftView.showGiftMsg(giftInfo,userProfile);
                 }
             }
 
@@ -161,6 +181,26 @@ public class WatcherLiveActivity extends AppCompatActivity {
                 mBottomControlView.setVisibility(View.INVISIBLE);
                 mChatView.setVisibility(View.VISIBLE);
             }
+
+            @Override
+            public void onGiftClick() {
+                //显示礼物操作栏
+                mBottomControlView.setVisibility(View.INVISIBLE);
+                GiftSelectDialog giftSelectDialog = new GiftSelectDialog(WatcherLiveActivity.this);
+                giftSelectDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        mBottomControlView.setVisibility(View.VISIBLE);
+                    }
+                });
+                giftSelectDialog.setOnGiftSendListener(new GiftSelectDialog.OnGiftSendListener() {
+                    @Override
+                    public void onGiftSend(ILVCustomCmd customCmd) {
+                        sendGiftMsg(customCmd);
+                    }
+                });
+                giftSelectDialog.show();
+            }
         });
 
         //聊天信息输入窗口
@@ -175,6 +215,28 @@ public class WatcherLiveActivity extends AppCompatActivity {
         //设置初始化的显示状态
         mBottomControlView.setVisibility(View.VISIBLE);
         mChatView.setVisibility(View.INVISIBLE);
+    }
+
+    private void sendGiftMsg(final ILVCustomCmd customCmd) {
+        //发送礼物消息
+        ILVLiveManager.getInstance().sendCustomCmd(customCmd, new ILiveCallBack<TIMMessage>() {
+            @Override
+            public void onSuccess(TIMMessage data) {
+                // TODO 显示动画效果
+                GiftSelectDialog.GiftCmdInfo cmdInfo =
+                        new Gson().fromJson(customCmd.getParam(), GiftSelectDialog.GiftCmdInfo.class);
+                if (cmdInfo == null) {
+                    return;
+                }
+                GiftInfo giftInfo = GiftInfo.getGiftById(cmdInfo.giftId);
+                mGiftView.showGiftMsg(giftInfo,BesterApplication.getApp().getSelfProfile());
+            }
+
+            @Override
+            public void onError(String module, int errCode, String errMsg) {
+
+            }
+        });
     }
 
     @NonNull

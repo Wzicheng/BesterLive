@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.neusoft.besterlive.control.view.SizeChangeRelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/activity_host_live"
+    android:id="@+id/activity_watch_live"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <com.tencent.ilivesdk.view.AVRootView
@@ -29,6 +29,16 @@
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_above="@id/bottom_chat_view"/>
+
+    <com.neusoft.besterlive.control.view.GiftRepeatView
+        android:id="@+id/gift_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/msg_list_view"
+        >
+
+    </com.neusoft.besterlive.control.view.GiftRepeatView>
+
 
     <com.neusoft.besterlive.control.view.DanMuView
         android:id="@+id/danmu_view"
