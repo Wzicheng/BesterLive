@@ -9,7 +9,7 @@ import com.neusoft.besterlive.R;
 public class GiftInfo {
 
     public static enum Type {
-        ContinueGift, FullScreenGift
+        HeartGift,ContinueGift, FullScreenGift
     }
 
     public int giftResId;

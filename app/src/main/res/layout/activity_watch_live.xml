@@ -23,6 +23,7 @@
         android:layout_alignParentBottom="true"
         />
 
+
     <com.neusoft.besterlive.control.view.MsgListView
         android:id="@+id/msg_list_view"
         android:padding="5dp"
@@ -30,6 +31,14 @@
         android:layout_height="200dp"
         android:layout_above="@id/bottom_chat_view"/>
 
+    <tyrantgit.widget.HeartLayout
+        android:id="@+id/heart_layout"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_above="@id/bottom_control_view"
+        />
+    
     <com.neusoft.besterlive.control.view.GiftRepeatView
         android:id="@+id/gift_repeate_view"
         android:layout_width="wrap_content"

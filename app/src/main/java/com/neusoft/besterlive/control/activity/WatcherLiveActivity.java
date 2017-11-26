@@ -1,6 +1,7 @@
 package com.neusoft.besterlive.control.activity;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,12 +30,19 @@ import com.tencent.TIMMessage;
 import com.tencent.TIMUserProfile;
 import com.tencent.av.sdk.AVRoomMulti;
 import com.tencent.ilivesdk.ILiveCallBack;
+import com.tencent.ilivesdk.core.ILiveRoomManager;
 import com.tencent.ilivesdk.view.AVRootView;
 import com.tencent.livesdk.ILVCustomCmd;
 import com.tencent.livesdk.ILVLiveConfig;
 import com.tencent.livesdk.ILVLiveManager;
 import com.tencent.livesdk.ILVLiveRoomOption;
 import com.tencent.livesdk.ILVText;
+
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import tyrantgit.widget.HeartLayout;
 
 /**
  * Created by Wzich on 2017/11/12.
@@ -45,12 +53,16 @@ public class WatcherLiveActivity extends AppCompatActivity {
     private AVRootView mLiveView;
     private BottomControlView mBottomControlView;
     private MsgListView mMsgListView;
+    private HeartLayout mHeartLayout;
     private GiftRepeatView mGiftRepeateView;
     private DanMuView mDanMuView;
     private ChatView mChatView;
     private GiftFullView mGiftFullView;
     private int roomId;
     private String userId;
+
+    private Timer heartTimer = new Timer();
+    private Random colorRandom = new Random();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,9 +92,13 @@ public class WatcherLiveActivity extends AppCompatActivity {
         ILVLiveManager.getInstance().joinRoom(roomId, memberOption, new ILiveCallBack() {
             @Override
             public void onSuccess(Object data) {
-                //加入房间成功
-                Toast.makeText(WatcherLiveActivity.this, "加入房间成功", Toast.LENGTH_SHORT).show();
-
+                //加入房间成功，显示心形欢迎动画
+                heartTimer.scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        showHeartAnim();
+                    }
+                },0,1000);
             }
 
             @Override
@@ -91,6 +107,23 @@ public class WatcherLiveActivity extends AppCompatActivity {
                 Toast.makeText(WatcherLiveActivity.this, "加入房间失败", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    //显示心形动画
+    private void showHeartAnim() {
+        mHeartLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mHeartLayout.addHeart(getRandomColor());
+            }
+        });
+    }
+
+    //获取心形动画随机颜色
+    private int getRandomColor() {
+        int randomColor = Color.rgb(colorRandom.nextInt(255),colorRandom.nextInt(255)
+                ,colorRandom.nextInt(255));
+        return randomColor;
     }
 
     private void initView() {
@@ -109,10 +142,28 @@ public class WatcherLiveActivity extends AppCompatActivity {
             }
         });
 
-        //礼物显示部分
+        //心形点赞窗口
+        mHeartLayout = (HeartLayout) findViewById(R.id.heart_layout);
+        mHeartLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //点击后发送心形礼物
+                ILVCustomCmd customCmd = new ILVCustomCmd();
+                customCmd.setCmd(IMConstants.CMD_MGS_GIFT);
+                customCmd.setType(ILVText.ILVTextType.eGroupMsg);
+                customCmd.setDestId(ILiveRoomManager.getInstance().getIMGroupId());
+                GiftSelectDialog.GiftCmdInfo giftCmdInfo = new GiftSelectDialog.GiftCmdInfo();
+                giftCmdInfo.giftId = GiftInfo.Gift_Heart.giftId;
+                customCmd.setParam(new Gson().toJson(giftCmdInfo));
+
+                sendGiftMsg(customCmd);
+            }
+        });
+
+        //礼物显示窗口
         mGiftRepeateView = (GiftRepeatView) findViewById(R.id.gift_repeate_view);
 
-        //弹幕显示部分
+        //弹幕显示窗口
         mDanMuView = (DanMuView) findViewById(R.id.danmu_view);
 
         //视频直播窗口
@@ -149,10 +200,12 @@ public class WatcherLiveActivity extends AppCompatActivity {
                             return;
                         }
                         GiftInfo giftInfo = GiftInfo.getGiftById(cmdInfo.giftId);
-                        if (giftInfo.type == GiftInfo.Type.ContinueGift){
-                            mGiftRepeateView.showGiftMsg(giftInfo, cmdInfo.repeatId, userProfile);
-                        } else {
-                            mGiftFullView.showGift(giftInfo,userProfile);
+                        if (giftInfo.giftId == GiftInfo.Gift_Heart.giftId){
+                            mHeartLayout.addHeart(getRandomColor());
+                        } else if (giftInfo.type == GiftInfo.Type.ContinueGift){
+                            mGiftRepeateView.showGiftMsg(giftInfo,cmdInfo.repeatId,BesterApplication.getApp().getSelfProfile());
+                        } else if (giftInfo.type == GiftInfo.Type.FullScreenGift){
+                            mGiftFullView.showGift(giftInfo,BesterApplication.getApp().getSelfProfile());
                         }
                 }
             }
@@ -234,16 +287,18 @@ public class WatcherLiveActivity extends AppCompatActivity {
                     return;
                 }
                 GiftInfo giftInfo = GiftInfo.getGiftById(cmdInfo.giftId);
-                if (giftInfo.type == GiftInfo.Type.ContinueGift){
+                if (giftInfo.giftId == GiftInfo.Gift_Heart.giftId){
+                    mHeartLayout.addHeart(getRandomColor());
+                } else if (giftInfo.type == GiftInfo.Type.ContinueGift){
                     mGiftRepeateView.showGiftMsg(giftInfo,cmdInfo.repeatId,BesterApplication.getApp().getSelfProfile());
-                } else {
+                } else if (giftInfo.type == GiftInfo.Type.FullScreenGift){
                     mGiftFullView.showGift(giftInfo,BesterApplication.getApp().getSelfProfile());
                 }
             }
 
             @Override
             public void onError(String module, int errCode, String errMsg) {
-
+                Toast.makeText(WatcherLiveActivity.this, "发送礼物失败,原因：" + errMsg, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -313,6 +368,8 @@ public class WatcherLiveActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //避免内存泄漏
+        heartTimer.cancel();
         quitRoom();
     }
 

@@ -47,4 +47,7 @@ dependencies {
 
     //Gson
     compile 'com.google.code.gson:gson:2.8.0'
+
+    //HeartLayout
+    compile 'tyrant:heartlayout:1.0.1'
 }
