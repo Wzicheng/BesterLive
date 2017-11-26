@@ -133,13 +133,13 @@ public class GiftGridView extends GridView {
                     @Override
                     public void onClick(View v) {
                         if (giftInfo == Gift_Empty){
-                            return;
+                            return ;
                         }
                         if (mOnGiftSelectListener != null){
-                            if (currentSelectGiftInfo != giftInfo){
-                                mOnGiftSelectListener.onSelected(giftInfo);
-                            } else {
+                            if (currentSelectGiftInfo == giftInfo){
                                 mOnGiftSelectListener.onSelected(null);
+                            } else {
+                                mOnGiftSelectListener.onSelected(giftInfo);
                             }
                         }
                     }

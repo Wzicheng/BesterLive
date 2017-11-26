@@ -15,6 +15,7 @@ import com.neusoft.besterlive.control.fragment.EditProfileFragment;
 import com.neusoft.besterlive.control.view.BottomControlView;
 import com.neusoft.besterlive.control.view.ChatView;
 import com.neusoft.besterlive.control.view.DanMuView;
+import com.neusoft.besterlive.control.view.GiftFullView;
 import com.neusoft.besterlive.control.view.GiftRepeatView;
 import com.neusoft.besterlive.control.view.GiftSelectDialog;
 import com.neusoft.besterlive.control.view.MsgListView;
@@ -46,7 +47,8 @@ public class HostLiveActivity extends AppCompatActivity {
     private BottomControlView mBottomControlView;
     private MsgListView mMsgListView;
     private DanMuView mDanMuView;
-    private GiftRepeatView mGiftView;
+    private GiftRepeatView mGiftRepeateView;
+    private GiftFullView mGiftFullView;
     private ChatView mChatView;
     private int roomId;
     @Override
@@ -135,7 +137,11 @@ public class HostLiveActivity extends AppCompatActivity {
                             return;
                         }
                         GiftInfo giftInfo = GiftInfo.getGiftById(cmdInfo.giftId);
-                        mGiftView.showGiftMsg(giftInfo, cmdInfo.repeatId, userProfile);
+                        if (giftInfo.type == GiftInfo.Type.ContinueGift){
+                            mGiftRepeateView.showGiftMsg(giftInfo, cmdInfo.repeatId, userProfile);
+                        } else {
+                            mGiftFullView.showGift(giftInfo,userProfile);
+                        }
                 }
             }
 
@@ -146,7 +152,7 @@ public class HostLiveActivity extends AppCompatActivity {
         });
 
         //礼物显示部分
-        mGiftView = (GiftRepeatView) findViewById(R.id.gift_view);
+        mGiftRepeateView = (GiftRepeatView) findViewById(R.id.gift_repeate_view);
 
         //弹幕显示部分
         mDanMuView = (DanMuView) findViewById(R.id.danmu_view);
@@ -186,6 +192,9 @@ public class HostLiveActivity extends AppCompatActivity {
                 sendChatMsg(customCmd);
             }
         });
+
+        //全屏礼物部分
+        mGiftFullView = (GiftFullView) findViewById(R.id.gift_full_view);
 
         //设置初始化的显示状态
         mBottomControlView.setVisibility(View.VISIBLE);

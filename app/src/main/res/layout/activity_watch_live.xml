@@ -31,7 +31,7 @@
         android:layout_above="@id/bottom_chat_view"/>
 
     <com.neusoft.besterlive.control.view.GiftRepeatView
-        android:id="@+id/gift_view"
+        android:id="@+id/gift_repeate_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/msg_list_view"
@@ -47,4 +47,11 @@
         android:layout_height="wrap_content">
 
     </com.neusoft.besterlive.control.view.DanMuView>
+
+    <com.neusoft.besterlive.control.view.GiftFullView
+        android:id="@+id/gift_full_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.neusoft.besterlive.control.view.GiftFullView>
 </com.neusoft.besterlive.control.view.SizeChangeRelativeLayout>

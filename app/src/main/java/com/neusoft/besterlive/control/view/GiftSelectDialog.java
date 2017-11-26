@@ -28,7 +28,6 @@ import com.tencent.livesdk.ILVText;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.R.attr.handle;
 
 /**
  * Created by Wzich on 2017/11/24.
@@ -115,6 +114,7 @@ public class GiftSelectDialog extends TransParentNoDialog {
             }
         });
         mSend = (Button) view.findViewById(R.id.send);
+        mSend.setVisibility(View.INVISIBLE);
         mSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
