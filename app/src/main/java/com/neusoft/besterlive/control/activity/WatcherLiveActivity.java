@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,7 +24,6 @@ import com.neusoft.besterlive.model.bean.CustomProfile;
 import com.neusoft.besterlive.model.bean.GiftInfo;
 import com.neusoft.besterlive.model.bean.IMConstants;
 import com.neusoft.besterlive.model.bean.MsgInfo;
-import com.neusoft.besterlive.utils.LogUtil;
 import com.tencent.TIMMessage;
 import com.tencent.TIMUserProfile;
 import com.tencent.av.sdk.AVRoomMulti;
@@ -36,8 +34,6 @@ import com.tencent.livesdk.ILVLiveConfig;
 import com.tencent.livesdk.ILVLiveManager;
 import com.tencent.livesdk.ILVLiveRoomOption;
 import com.tencent.livesdk.ILVText;
-
-import static android.R.id.message;
 
 /**
  * Created by Wzich on 2017/11/12.
@@ -144,14 +140,14 @@ public class WatcherLiveActivity extends AppCompatActivity {
                         break;
 
                     case IMConstants.CMD_MGS_GIFT: //来自礼物
-                        //TODO 显示动画
+                        //显示动画
                        GiftSelectDialog.GiftCmdInfo cmdInfo = new Gson().fromJson(cmd.getParam()
                             ,GiftSelectDialog.GiftCmdInfo.class);
                         if (cmdInfo == null){
                             return;
                         }
                         GiftInfo giftInfo = GiftInfo.getGiftById(cmdInfo.giftId);
-                        mGiftView.showGiftMsg(giftInfo,userProfile);
+                        mGiftView.showGiftMsg(giftInfo, cmdInfo.repeatId, userProfile);
                 }
             }
 
@@ -222,14 +218,14 @@ public class WatcherLiveActivity extends AppCompatActivity {
         ILVLiveManager.getInstance().sendCustomCmd(customCmd, new ILiveCallBack<TIMMessage>() {
             @Override
             public void onSuccess(TIMMessage data) {
-                // TODO 显示动画效果
+                // 显示动画效果
                 GiftSelectDialog.GiftCmdInfo cmdInfo =
                         new Gson().fromJson(customCmd.getParam(), GiftSelectDialog.GiftCmdInfo.class);
                 if (cmdInfo == null) {
                     return;
                 }
                 GiftInfo giftInfo = GiftInfo.getGiftById(cmdInfo.giftId);
-                mGiftView.showGiftMsg(giftInfo,BesterApplication.getApp().getSelfProfile());
+                mGiftView.showGiftMsg(giftInfo,cmdInfo.repeatId,BesterApplication.getApp().getSelfProfile());
             }
 
             @Override

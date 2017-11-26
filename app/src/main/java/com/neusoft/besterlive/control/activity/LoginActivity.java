@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -21,11 +20,6 @@ import com.tencent.TIMValueCallBack;
 import com.tencent.ilivesdk.ILiveCallBack;
 import com.tencent.ilivesdk.core.ILiveLoginManager;
 
-import static com.neusoft.besterlive.BesterApplication.getApp;
-import static com.neusoft.besterlive.R.id.et_account;
-import static com.neusoft.besterlive.R.id.et_password;
-import static com.tencent.qalsdk.base.a.ac;
-
 public class LoginActivity extends Activity {
     private EditText mEtAccount;
     private EditText mEtPassword;
@@ -35,6 +29,7 @@ public class LoginActivity extends Activity {
     private String account;
     private String password;
     private boolean isFromRegister;
+    private boolean isFirstLogin = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +40,8 @@ public class LoginActivity extends Activity {
     }
 
     private void initData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("LoginInfo",MODE_PRIVATE);
+        isFirstLogin = sharedPreferences.getBoolean("isFirstLogin",true);
         isFromRegister = getIntent().getBooleanExtra("isFromRegister",false);
         if(isFromRegister){
             account = getIntent().getStringExtra("account");
@@ -54,7 +51,16 @@ public class LoginActivity extends Activity {
                 mEtPassword.setText(password);
                 Login(account,password);
             }
+        }else {
+            account = sharedPreferences.getString("account","");
+            password = sharedPreferences.getString("password","");
+            if (!TextUtils.isEmpty(account) && !TextUtils.isEmpty(password)){
+                mEtAccount.setText(account);
+                mEtPassword.setText(password);
+                Login(account,password);
+            }
         }
+
     }
 
 
@@ -82,6 +88,7 @@ public class LoginActivity extends Activity {
         }
 
         // TODO validate success, do something
+
         Login(account,password);
 
     }
@@ -93,10 +100,10 @@ public class LoginActivity extends Activity {
                 ILiveLoginManager.getInstance().iLiveLogin(account, data, new ILiveCallBack() {
                     @Override
                     public void onSuccess(Object data) {
-                        //最终登录成功
+                        //最终登录成功，获取用户信息字段
                         getSelfProfile();
-                        SharedPreferences sharedPreferences = getSharedPreferences("FirstLogin",MODE_PRIVATE);
-                        boolean isFirstLogin = sharedPreferences.getBoolean("firstLogin",true);
+                        //登陆成功将登录信息保存
+                        saveLoginInfo();
                         Toast.makeText(LoginActivity.this, "登录成功！", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent();
                         if (isFirstLogin){
@@ -122,6 +129,17 @@ public class LoginActivity extends Activity {
             }
         });
     }
+
+    private void saveLoginInfo() {
+        SharedPreferences sharedPreferences = getSharedPreferences("LoginInfo",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();//获取编辑器
+        if (!TextUtils.isEmpty(account) && !TextUtils.isEmpty(password)){
+            editor.putString("account",account);
+            editor.putString("password",password);
+            editor.commit();
+        }
+    }
+
 
     /**
      * 获取用户字段信息

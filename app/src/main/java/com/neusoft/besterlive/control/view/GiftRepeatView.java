@@ -9,12 +9,18 @@ import com.neusoft.besterlive.R;
 import com.neusoft.besterlive.model.bean.GiftInfo;
 import com.tencent.TIMUserProfile;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Created by Wzich on 2017/11/24.
  */
 
 public class GiftRepeatView extends LinearLayout {
     private GiftRepeatItemView mItem0,mItem1;
+
+    private LinkedList<GiftCacheInfo> cacheInfoList = new LinkedList<>();
 
     public GiftRepeatView(Context context) {
         super(context);
@@ -43,19 +49,41 @@ public class GiftRepeatView extends LinearLayout {
 
         mItem0.setVisibility(INVISIBLE);
         mItem1.setVisibility(INVISIBLE);
+
+        mItem0.setOnAvaliableListener(new MyOnAvaliableListener());
+        mItem1.setOnAvaliableListener(new MyOnAvaliableListener());
     }
 
 
-    public void showGiftMsg(GiftInfo giftInfo, TIMUserProfile userProfile) {
-        GiftRepeatItemView avaliableItem = getAvaliableItem();
-        if (avaliableItem == null){
-            //TODO 当前都不可用，将礼物信息缓存
+    public void showGiftMsg(GiftInfo giftInfo, String repeatId, TIMUserProfile userProfile) {
+        GiftRepeatItemView avaliableItem = getAvaliableItem(giftInfo,repeatId,userProfile);
+        if (avaliableItem != null){
+            avaliableItem.showGiftMsg(giftInfo,repeatId,userProfile);
         } else {
-            avaliableItem.showGiftMsg(giftInfo,userProfile);
+            //当前都不可用，将礼物信息缓存
+            GiftCacheInfo cacheInfo = new GiftCacheInfo();
+            cacheInfo.giftInfo = giftInfo;
+            cacheInfo.repeatId = repeatId;
+            cacheInfo.userProfile = userProfile;
+            cacheInfoList.add(cacheInfo);
         }
     }
 
-    private GiftRepeatItemView getAvaliableItem() {
+    private class GiftCacheInfo{
+        public GiftInfo giftInfo;
+        public String repeatId;
+        public TIMUserProfile userProfile;
+    }
+
+    private GiftRepeatItemView getAvaliableItem(GiftInfo giftInfo, String repeatId, TIMUserProfile userProfile) {
+        if (mItem0.isMatch(giftInfo,repeatId,userProfile)){
+            return mItem0;
+        }
+
+        if (mItem1.isMatch(giftInfo,repeatId,userProfile)){
+            return mItem1;
+        }
+
         if (mItem0.isAvaliable()){
             return mItem0;
         }
@@ -63,5 +91,30 @@ public class GiftRepeatView extends LinearLayout {
             return mItem1;
         }
         return null;
+    }
+
+    private class MyOnAvaliableListener implements GiftRepeatItemView.OnAvaliableListener {
+
+        @Override
+        public void onAvaliavle() {
+            if (cacheInfoList.size() > 0){
+                GiftCacheInfo firstCacheInfo = cacheInfoList.removeFirst();
+                showGiftMsg(firstCacheInfo.giftInfo,firstCacheInfo.repeatId,firstCacheInfo.userProfile);
+                //找出缓存中和第一个礼物相同的连发信息
+                List<GiftCacheInfo> leftSameInfos = new ArrayList<>();
+                for (GiftCacheInfo info : cacheInfoList) {
+                    if (info.repeatId.equals(firstCacheInfo.repeatId) && info.giftInfo.giftId == firstCacheInfo.giftInfo.giftId
+                            && info.userProfile.getIdentifier().equals(firstCacheInfo.userProfile.getIdentifier())
+                                && info.repeatId.equals(firstCacheInfo.repeatId)){
+                        //三者同时满足，则为连发礼物
+                        leftSameInfos.add(info);
+                    }
+                }
+                cacheInfoList.removeAll(leftSameInfos);
+                for (GiftCacheInfo sameCacheInfo : leftSameInfos) {
+                    showGiftMsg(sameCacheInfo.giftInfo,sameCacheInfo.repeatId,sameCacheInfo.userProfile);
+                }
+            }
+        }
     }
 }

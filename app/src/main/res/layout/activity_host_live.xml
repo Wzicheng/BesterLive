@@ -31,6 +31,15 @@
         android:layout_height="200dp"
         android:layout_above="@id/bottom_chat_view"/>
 
+    <com.neusoft.besterlive.control.view.GiftRepeatView
+        android:id="@+id/gift_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/msg_list_view"
+        >
+
+    </com.neusoft.besterlive.control.view.GiftRepeatView>
+
     <com.neusoft.besterlive.control.view.DanMuView
         android:id="@+id/danmu_view"
         android:layout_above="@id/msg_list_view"

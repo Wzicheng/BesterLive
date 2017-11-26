@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,13 +28,15 @@ import com.tencent.livesdk.ILVText;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.R.attr.handle;
+
 /**
  * Created by Wzich on 2017/11/24.
  */
 
 public class GiftSelectDialog extends TransParentNoDialog {
 
-//    private static final int WHAT_REPEATGIFT_FINISH = 0;
+    private static final int WHAT_REPEATGIFT_FINISH = 0;
     private ViewPager mGiftPager;
     private ImageView mIndicatorOne;
     private ImageView mIndicatorTwo;
@@ -44,19 +47,19 @@ public class GiftSelectDialog extends TransParentNoDialog {
     private List<GiftInfo> giftInfoList = new ArrayList<>();
     private List<GiftGridView> gridViewPages = new ArrayList<>();
     private GiftInfo selectedGiftInfo;
-//    private String repeatId = "";
+    private String repeatId = "";
 
-//    private Handler handle = new Handler(){
-//        @Override
-//        public void handleMessage(Message msg) {
-//            switch (msg.what){
-//                case WHAT_REPEATGIFT_FINISH:
-//                    //2s内没有点击发送相同的礼物，视为非连续发送
-//                    repeatId = "";
-//                    break;
-//            }
-//        }
-//    };
+    private Handler handle = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case WHAT_REPEATGIFT_FINISH:
+                    //2s内没有点击发送相同的礼物，视为非连续发送
+                    repeatId = "";
+                    break;
+            }
+        }
+    };
 
     public GiftSelectDialog(Activity activity) {
         super(activity);
@@ -115,9 +118,9 @@ public class GiftSelectDialog extends TransParentNoDialog {
         mSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (TextUtils.isEmpty(repeatId)){
-//                    repeatId = System.currentTimeMillis() + "";
-//                }
+                if (TextUtils.isEmpty(repeatId)){
+                    repeatId = System.currentTimeMillis() + "";
+                }
 
                 //发送礼物消息
                 if (onGiftSendListener != null) {
@@ -127,28 +130,28 @@ public class GiftSelectDialog extends TransParentNoDialog {
                     customCmd.setDestId(ILiveRoomManager.getInstance().getIMGroupId());
                     GiftCmdInfo giftCmdInfo = new GiftCmdInfo();
                     giftCmdInfo.giftId = selectedGiftInfo.giftId;
-//                    giftCmdInfo.repeatId = repeatId;
+                    giftCmdInfo.repeatId = repeatId;
                     customCmd.setParam(new Gson().toJson(giftCmdInfo));
 
                     onGiftSendListener.onGiftSend(customCmd);
 
-//                    if(selectedGiftInfo.type == GiftInfo.Type.ContinueGift){
-//                        startRepeatTimer();
-//                    }
+                    if(selectedGiftInfo.type == GiftInfo.Type.ContinueGift){
+                        startRepeatTimer();
+                    }
                 }
             }
         });
     }
 
-//    private void startRepeatTimer() {
-//        handle.removeMessages(WHAT_REPEATGIFT_FINISH);
-//        handle.sendEmptyMessageDelayed(WHAT_REPEATGIFT_FINISH,2000);
-//    }
+    private void startRepeatTimer() {
+        handle.removeMessages(WHAT_REPEATGIFT_FINISH);
+        handle.sendEmptyMessageDelayed(WHAT_REPEATGIFT_FINISH,2000);
+    }
 
 
     public static class GiftCmdInfo {
         public int giftId;
-//        public String repeatId;
+        public String repeatId;
     }
 
 
@@ -189,7 +192,7 @@ public class GiftSelectDialog extends TransParentNoDialog {
                 public void onSelected(GiftInfo giftInfo) {
                     //选择礼物
                     selectedGiftInfo = giftInfo;
-//                    repeatId = "";
+                    repeatId = "";
                     for (GiftGridView item : gridViewPages){
                         item.setSelectedGiftInfo(selectedGiftInfo);
                     }

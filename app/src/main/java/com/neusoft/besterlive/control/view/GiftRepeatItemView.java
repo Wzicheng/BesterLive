@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -31,6 +30,14 @@ public class GiftRepeatItemView extends RelativeLayout {
     private Animation viewOutAnim;
     private Animation imgIconInAnim;
     private Animation numScaleAnim;
+
+    private int giftId = -1;
+    private String repeatId;
+    private String userId;
+    private int currentGiftNum = 0;
+    private int leftGiftNum = 0;
+
+    private Boolean inAnim = false;
 
     public GiftRepeatItemView(Context context) {
         super(context);
@@ -107,15 +114,23 @@ public class GiftRepeatItemView extends RelativeLayout {
         numScaleAnim.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
+                currentGiftNum ++;
+                leftGiftNum --;
+                mGiftNum.setText("x" + currentGiftNum);
                 mGiftNum.setVisibility(VISIBLE);
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
+
                 post(new Runnable() {
                     @Override
                     public void run() {
-                        startAnimation(viewOutAnim);
+                        if (leftGiftNum > 0){
+                            mGiftNum.startAnimation(numScaleAnim);
+                        } else {
+                            startAnimation(viewOutAnim);
+                        }
                     }
                 });
             }
@@ -134,6 +149,13 @@ public class GiftRepeatItemView extends RelativeLayout {
             @Override
             public void onAnimationEnd(Animation animation) {
                 setVisibility(INVISIBLE);
+                giftId = -1;
+                currentGiftNum = 0;
+                leftGiftNum = 0;
+                inAnim = false;
+                if (mAvaliableListener != null){
+                    mAvaliableListener.onAvaliavle();
+                }
             }
 
             @Override
@@ -151,12 +173,21 @@ public class GiftRepeatItemView extends RelativeLayout {
         mGiftNum = (TextView) findViewById(R.id.gift_num);
     }
 
-    public void showGiftMsg(GiftInfo giftInfo, TIMUserProfile userProfile) {
-        if (giftInfo != null && userProfile != null){
-            bindData2View(giftInfo,userProfile);
+    public void showGiftMsg(GiftInfo giftInfo, String repeatId, TIMUserProfile userProfile) {
+        if (giftId == -1){
+            this.giftId = giftInfo.giftId;
+            this.repeatId = repeatId;
+            this.userId = userProfile.getIdentifier();
         }
-
-        startAnim();
+        leftGiftNum ++;
+        if (!inAnim){
+            if (giftInfo != null && userProfile != null){
+                bindData2View(giftInfo,userProfile);
+            }
+            startAnim();
+        } else {
+            return;
+        }
     }
 
     //绑定数据
@@ -180,6 +211,7 @@ public class GiftRepeatItemView extends RelativeLayout {
     }
 
     private void startAnim() {
+        inAnim = true;
         post(new Runnable() {
             @Override
             public void run() {
@@ -188,9 +220,26 @@ public class GiftRepeatItemView extends RelativeLayout {
         });
     }
 
-
+    public boolean isMatch(GiftInfo giftInfo, String repeatId, TIMUserProfile userProfile){
+        if (getVisibility() == VISIBLE) {
+            if (repeatId.equals(this.repeatId) && userId.equals(userProfile.getIdentifier())
+                    && giftId == giftInfo.giftId) {
+                return true;
+            }
+        }
+            return false;
+    }
 
     public boolean isAvaliable() {
-        return getVisibility() != VISIBLE;
+            return getVisibility() != VISIBLE;
+    }
+
+    private OnAvaliableListener mAvaliableListener;
+    public void setOnAvaliableListener(OnAvaliableListener listener){
+        mAvaliableListener = listener;
+    }
+
+    public interface OnAvaliableListener{
+        void onAvaliavle();
     }
 }

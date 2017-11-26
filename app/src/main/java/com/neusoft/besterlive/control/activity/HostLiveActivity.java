@@ -8,16 +8,19 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.neusoft.besterlive.BesterApplication;
 import com.neusoft.besterlive.R;
 import com.neusoft.besterlive.control.fragment.EditProfileFragment;
 import com.neusoft.besterlive.control.view.BottomControlView;
 import com.neusoft.besterlive.control.view.ChatView;
 import com.neusoft.besterlive.control.view.DanMuView;
+import com.neusoft.besterlive.control.view.GiftRepeatView;
 import com.neusoft.besterlive.control.view.GiftSelectDialog;
 import com.neusoft.besterlive.control.view.MsgListView;
 import com.neusoft.besterlive.control.view.SizeChangeRelativeLayout;
 import com.neusoft.besterlive.model.bean.CustomProfile;
+import com.neusoft.besterlive.model.bean.GiftInfo;
 import com.neusoft.besterlive.model.bean.IMConstants;
 import com.neusoft.besterlive.model.bean.MsgInfo;
 import com.tencent.TIMMessage;
@@ -43,7 +46,7 @@ public class HostLiveActivity extends AppCompatActivity {
     private BottomControlView mBottomControlView;
     private MsgListView mMsgListView;
     private DanMuView mDanMuView;
-
+    private GiftRepeatView mGiftView;
     private ChatView mChatView;
     private int roomId;
     @Override
@@ -124,8 +127,15 @@ public class HostLiveActivity extends AppCompatActivity {
                        mDanMuView.showMsgDanMu(msgInfo);
                        break;
 
-                   case IMConstants.CMD_MGS_GIFT: //来自礼物
-                       break;
+                    case IMConstants.CMD_MGS_GIFT: //来自礼物
+                        //显示动画
+                        GiftSelectDialog.GiftCmdInfo cmdInfo = new Gson().fromJson(cmd.getParam()
+                                ,GiftSelectDialog.GiftCmdInfo.class);
+                        if (cmdInfo == null){
+                            return;
+                        }
+                        GiftInfo giftInfo = GiftInfo.getGiftById(cmdInfo.giftId);
+                        mGiftView.showGiftMsg(giftInfo, cmdInfo.repeatId, userProfile);
                 }
             }
 
@@ -134,6 +144,9 @@ public class HostLiveActivity extends AppCompatActivity {
 
             }
         });
+
+        //礼物显示部分
+        mGiftView = (GiftRepeatView) findViewById(R.id.gift_view);
 
         //弹幕显示部分
         mDanMuView = (DanMuView) findViewById(R.id.danmu_view);
