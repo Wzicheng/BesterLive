@@ -40,7 +40,8 @@ public class CreateLiveRoomRequest extends BaseRequest {
 
     @Override
     public Object onSuccess(String body) {
-        CreateLiveRoomResponseObject responseObject = gson.fromJson(body, CreateLiveRoomResponseObject.class);
+        CreateLiveRoomResponseObject responseObject = gson.fromJson(body
+                ,CreateLiveRoomResponseObject.class);
         return responseObject.data;
     }
 }

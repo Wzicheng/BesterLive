@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.neusoft.besterlive.BesterApplication;
 import com.neusoft.besterlive.R;
 import com.neusoft.besterlive.control.fragment.EditProfileFragment;
+import com.neusoft.besterlive.control.http.request.GetGiftRequest;
 import com.neusoft.besterlive.control.view.BottomControlView;
 import com.neusoft.besterlive.control.view.ChatView;
 import com.neusoft.besterlive.control.view.DanMuView;
@@ -25,8 +26,13 @@ import com.neusoft.besterlive.model.bean.CustomProfile;
 import com.neusoft.besterlive.model.bean.GiftInfo;
 import com.neusoft.besterlive.model.bean.IMConstants;
 import com.neusoft.besterlive.model.bean.MsgInfo;
+import com.neusoft.besterlive.model.bean.UserInfo;
+import com.neusoft.besterlive.utils.BaseRequest;
+import com.tencent.TIMCallBack;
+import com.tencent.TIMFriendshipManager;
 import com.tencent.TIMMessage;
 import com.tencent.TIMUserProfile;
+import com.tencent.TIMValueCallBack;
 import com.tencent.av.sdk.AVRoomMulti;
 import com.tencent.ilivesdk.ILiveCallBack;
 import com.tencent.ilivesdk.ILiveConstants;
@@ -117,6 +123,7 @@ public class HostLiveActivity extends AppCompatActivity {
         return randomColor;
     }
 
+    //初始化各控件
     private void initView() {
         //对整个RelativeLayout进行监听
         mActivityHostLive = (SizeChangeRelativeLayout) findViewById(R.id.activity_host_live);
@@ -168,8 +175,10 @@ public class HostLiveActivity extends AppCompatActivity {
                         if (giftInfo.giftId == GiftInfo.Gift_Heart.giftId){
                             mHeartLayout.addHeart(getRandomColor());
                         } else if (giftInfo.type == GiftInfo.Type.ContinueGift){
+                            getGift(giftInfo);
                             mGiftRepeateView.showGiftMsg(giftInfo,cmdInfo.repeatId,BesterApplication.getApp().getSelfProfile());
                         } else if (giftInfo.type == GiftInfo.Type.FullScreenGift){
+                            getGift(giftInfo);
                             mGiftFullView.showGift(giftInfo,BesterApplication.getApp().getSelfProfile());
                         }
                 }
@@ -235,15 +244,50 @@ public class HostLiveActivity extends AppCompatActivity {
         mChatView.setVisibility(View.INVISIBLE);
     }
 
-    private void showHeartAnim() {
-        mHeartLayout.post(new Runnable() {
+    private void getGift(GiftInfo giftInfo) {
+        GetGiftRequest request = new GetGiftRequest();
+        request.setOnResultListener(new BaseRequest.OnResultListener<UserInfo>() {
             @Override
-            public void run() {
-                mHeartLayout.addHeart(getRandomColor());
+            public void onFail(int code, String msg) {
+
+            }
+
+            @Override
+            public void onSuccess(UserInfo object) {
+                //更新IM的信息
+                //更新等级信息
+                TIMFriendshipManager.getInstance().setCustomInfo(CustomProfile.CUSTOM_LEVEL, (object.level + "").getBytes(), new TIMCallBack() {
+                    @Override
+                    public void onError(int i, String s) {
+
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        saveSelfInfo();
+                    }
+                });
+                TIMFriendshipManager.getInstance().setCustomInfo(CustomProfile.CUSTOM_GET, (object.getNums + "").getBytes(), new TIMCallBack() {
+                    @Override
+                    public void onError(int i, String s) {
+
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        saveSelfInfo();
+                    }
+                });
             }
         });
+        GetGiftRequest.GetGiftParam param = new GetGiftRequest.GetGiftParam();
+        param.exp = giftInfo.expValue;
+        param.userId = BesterApplication.getApp().getSelfProfile().getIdentifier();
+        request.request(param);
     }
 
+
+    //获得Msg信息
     @NonNull
     private MsgInfo getMsgInfo(ILVCustomCmd cmd, TIMUserProfile userProfile) {
         MsgInfo msgInfo = new MsgInfo();
@@ -260,9 +304,8 @@ public class HostLiveActivity extends AppCompatActivity {
         msgInfo.userAvatar = userProfile.getFaceUrl();
         return msgInfo;
     }
-
+    //发送聊天消息
     private void sendChatMsg(final ILVCustomCmd customCmd) {
-        //发送消息
         ILVLiveManager.getInstance().sendCustomCmd(customCmd, new ILiveCallBack<TIMMessage>() {
             @Override
             public void onSuccess(TIMMessage data) {
@@ -324,6 +367,32 @@ public class HostLiveActivity extends AppCompatActivity {
             @Override
             public void onError(String module, int errCode, String errMsg) {
                 Toast.makeText(HostLiveActivity.this, "退出房间失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // 保存更新信息
+    private void saveSelfInfo() {
+        TIMFriendshipManager.getInstance().getSelfProfile(new TIMValueCallBack<TIMUserProfile>() {
+            @Override
+            public void onError(int i, String s) {
+
+            }
+
+            @Override
+            public void onSuccess(TIMUserProfile timUserProfile) {
+                //获取用户字段信息成功，将其保存
+                BesterApplication.getApp().saveSelfProfile(timUserProfile);
+            }
+        });
+    }
+
+    //展示心形动画
+    private void showHeartAnim() {
+        mHeartLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mHeartLayout.addHeart(getRandomColor());
             }
         });
     }

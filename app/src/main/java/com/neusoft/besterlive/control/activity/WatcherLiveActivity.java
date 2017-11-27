@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import com.neusoft.besterlive.BesterApplication;
 import com.neusoft.besterlive.R;
 import com.neusoft.besterlive.control.fragment.EditProfileFragment;
+import com.neusoft.besterlive.control.http.request.SendGiftRequest;
 import com.neusoft.besterlive.control.view.BottomControlView;
 import com.neusoft.besterlive.control.view.ChatView;
 import com.neusoft.besterlive.control.view.DanMuView;
@@ -26,8 +27,13 @@ import com.neusoft.besterlive.model.bean.CustomProfile;
 import com.neusoft.besterlive.model.bean.GiftInfo;
 import com.neusoft.besterlive.model.bean.IMConstants;
 import com.neusoft.besterlive.model.bean.MsgInfo;
+import com.neusoft.besterlive.model.bean.UserInfo;
+import com.neusoft.besterlive.utils.BaseRequest;
+import com.tencent.TIMCallBack;
+import com.tencent.TIMFriendshipManager;
 import com.tencent.TIMMessage;
 import com.tencent.TIMUserProfile;
+import com.tencent.TIMValueCallBack;
 import com.tencent.av.sdk.AVRoomMulti;
 import com.tencent.ilivesdk.ILiveCallBack;
 import com.tencent.ilivesdk.core.ILiveRoomManager;
@@ -290,8 +296,10 @@ public class WatcherLiveActivity extends AppCompatActivity {
                 if (giftInfo.giftId == GiftInfo.Gift_Heart.giftId){
                     mHeartLayout.addHeart(getRandomColor());
                 } else if (giftInfo.type == GiftInfo.Type.ContinueGift){
+                    sendGift(giftInfo);
                     mGiftRepeateView.showGiftMsg(giftInfo,cmdInfo.repeatId,BesterApplication.getApp().getSelfProfile());
                 } else if (giftInfo.type == GiftInfo.Type.FullScreenGift){
+                    sendGift(giftInfo);
                     mGiftFullView.showGift(giftInfo,BesterApplication.getApp().getSelfProfile());
                 }
             }
@@ -301,6 +309,49 @@ public class WatcherLiveActivity extends AppCompatActivity {
                 Toast.makeText(WatcherLiveActivity.this, "发送礼物失败,原因：" + errMsg, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void sendGift(GiftInfo giftInfo) {
+        SendGiftRequest request = new SendGiftRequest();
+        request.setOnResultListener(new BaseRequest.OnResultListener<UserInfo>() {
+            @Override
+            public void onFail(int code, String msg) {
+
+            }
+
+            @Override
+            public void onSuccess(UserInfo data) {
+                //更新等级信息
+                TIMFriendshipManager.getInstance().setCustomInfo(CustomProfile.CUSTOM_LEVEL,
+                        (data.level + "").getBytes(), new TIMCallBack() {
+                            @Override
+                            public void onError(int i, String s) {
+
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                saveSelfInfo();
+                            }
+                        });
+                TIMFriendshipManager.getInstance().setCustomInfo(CustomProfile.CUSTOM_SEND,
+                        (data.sendNums + "").getBytes(), new TIMCallBack() {
+                            @Override
+                            public void onError(int i, String s) {
+
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                saveSelfInfo();
+                            }
+                        });
+            }
+        });
+        SendGiftRequest.SendGiftParam param = new SendGiftRequest.SendGiftParam();
+        param.userId = BesterApplication.getApp().getSelfProfile().getIdentifier();
+        param.exp = giftInfo.expValue;
+        request.request(param);
     }
 
     @NonNull
@@ -384,6 +435,22 @@ public class WatcherLiveActivity extends AppCompatActivity {
             @Override
             public void onError(String module, int errCode, String errMsg) {
                 Toast.makeText(WatcherLiveActivity.this, "退出房间失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // 保存更新信息
+    private void saveSelfInfo() {
+        TIMFriendshipManager.getInstance().getSelfProfile(new TIMValueCallBack<TIMUserProfile>() {
+            @Override
+            public void onError(int i, String s) {
+
+            }
+
+            @Override
+            public void onSuccess(TIMUserProfile timUserProfile) {
+                //获取用户字段信息成功，将其保存
+                BesterApplication.getApp().saveSelfProfile(timUserProfile);
             }
         });
     }
