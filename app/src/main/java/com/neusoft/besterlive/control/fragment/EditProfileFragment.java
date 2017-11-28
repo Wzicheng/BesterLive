@@ -19,10 +19,10 @@ import android.widget.Toast;
 
 import com.neusoft.besterlive.BesterApplication;
 import com.neusoft.besterlive.R;
-import com.neusoft.besterlive.control.view.EditGenderDialog;
-import com.neusoft.besterlive.control.view.EditProfile;
-import com.neusoft.besterlive.control.view.EditProfileDialog;
-import com.neusoft.besterlive.control.view.TextProfile;
+import com.neusoft.besterlive.view.Dialog.EditGenderDialog;
+import com.neusoft.besterlive.view.weight.EditProfile;
+import com.neusoft.besterlive.view.Dialog.EditProfileDialog;
+import com.neusoft.besterlive.view.TextProfile;
 import com.neusoft.besterlive.model.bean.CustomProfile;
 import com.neusoft.besterlive.utils.ImgUtils;
 import com.neusoft.besterlive.utils.PicChooserHelper;

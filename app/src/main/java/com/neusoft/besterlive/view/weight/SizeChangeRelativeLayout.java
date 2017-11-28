@@ -1,4 +1,4 @@
-package com.neusoft.besterlive.control.view;
+package com.neusoft.besterlive.view.weight;
 
 import android.content.Context;
 import android.util.AttributeSet;

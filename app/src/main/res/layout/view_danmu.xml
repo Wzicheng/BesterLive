@@ -4,12 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.neusoft.besterlive.control.view.DanMuItemView
+    <com.neusoft.besterlive.view.DanMuItemView
         android:id="@+id/item_0"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <com.neusoft.besterlive.control.view.DanMuItemView
+    <com.neusoft.besterlive.view.DanMuItemView
         android:id="@+id/item_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

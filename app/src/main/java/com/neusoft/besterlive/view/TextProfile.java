@@ -1,14 +1,16 @@
-package com.neusoft.besterlive.control.view;
+package com.neusoft.besterlive.view;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
+import com.neusoft.besterlive.view.weight.EditProfile;
+
 /**
  * Created by Wzich on 2017/10/29.
  */
 
-public class TextProfile extends EditProfile{
+public class TextProfile extends EditProfile {
     public TextProfile(Context context) {
         super(context);
         disableEdit();

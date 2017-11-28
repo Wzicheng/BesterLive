@@ -15,14 +15,14 @@ import com.neusoft.besterlive.BesterApplication;
 import com.neusoft.besterlive.R;
 import com.neusoft.besterlive.control.fragment.EditProfileFragment;
 import com.neusoft.besterlive.control.http.request.SendGiftRequest;
-import com.neusoft.besterlive.control.view.BottomControlView;
-import com.neusoft.besterlive.control.view.ChatView;
-import com.neusoft.besterlive.control.view.DanMuView;
-import com.neusoft.besterlive.control.view.GiftFullView;
-import com.neusoft.besterlive.control.view.GiftRepeatView;
-import com.neusoft.besterlive.control.view.GiftSelectDialog;
-import com.neusoft.besterlive.control.view.MsgListView;
-import com.neusoft.besterlive.control.view.SizeChangeRelativeLayout;
+import com.neusoft.besterlive.view.BottomControlView;
+import com.neusoft.besterlive.view.ChatView;
+import com.neusoft.besterlive.view.DanMuView;
+import com.neusoft.besterlive.view.GiftFullView;
+import com.neusoft.besterlive.view.GiftRepeatView;
+import com.neusoft.besterlive.view.Dialog.GiftSelectDialog;
+import com.neusoft.besterlive.view.MsgListView;
+import com.neusoft.besterlive.view.weight.SizeChangeRelativeLayout;
 import com.neusoft.besterlive.model.bean.CustomProfile;
 import com.neusoft.besterlive.model.bean.GiftInfo;
 import com.neusoft.besterlive.model.bean.IMConstants;
@@ -229,6 +229,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
 
         //底部控制窗口，设置监听
         mBottomControlView = (BottomControlView) findViewById(R.id.bottom_control_view);
+        mBottomControlView.isHost(false);
         mBottomControlView.setOnControlClickListener(new BottomControlView.OnControlClickListener() {
             @Override
             public void onCloseClick() {
@@ -261,6 +262,11 @@ public class WatcherLiveActivity extends AppCompatActivity {
                     }
                 });
                 giftSelectDialog.show();
+            }
+
+            @Override
+            public void onOperateClick(View view) {
+
             }
         });
 

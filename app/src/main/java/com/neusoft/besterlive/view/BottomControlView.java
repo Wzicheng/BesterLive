@@ -1,4 +1,4 @@
-package com.neusoft.besterlive.control.view;
+package com.neusoft.besterlive.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -43,12 +43,28 @@ public class BottomControlView extends RelativeLayout {
         mClose = (ImageView) findViewById(R.id.close);
         mChat = (ImageView) findViewById(R.id.chat);
         mGift = (ImageView) findViewById(R.id.gift);
-//        mOperate = (ImageView) findViewById(R.id.operate);
+        mOperate = (ImageView) findViewById(R.id.operate);
 
         mClose.setOnClickListener(new MyOnClickListener());
         mChat.setOnClickListener(new MyOnClickListener());
         mGift.setOnClickListener(new MyOnClickListener());
-//        mOperate.setOnClickListener(new MyOnClickListener());
+        mOperate.setOnClickListener(new MyOnClickListener());
+    }
+
+    public void isHost(boolean isHost){
+        if (isHost){
+            mGift.setVisibility(INVISIBLE);
+            mOperate.setVisibility(VISIBLE);
+        } else {
+            mGift.setVisibility(VISIBLE);
+            mOperate.setVisibility(INVISIBLE);
+        }
+    }
+
+    public void setOperateIcon(boolean isOpen) {
+        if (!isOpen){
+            mOperate.setImageResource(R.drawable.icon_op_open);
+        }
     }
 
     private class MyOnClickListener implements OnClickListener {
@@ -70,11 +86,12 @@ public class BottomControlView extends RelativeLayout {
                         mOnControlClickListener.onGiftClick();
                     }
                     break;
-//                case R.id.operate:
-//                    if (mOnControlClickListener != null) {
-//                        mOnControlClickListener.onOperateClick();
-//                    }
-//                    break;
+                case R.id.operate:
+                    if (mOnControlClickListener != null) {
+                        mOnControlClickListener.onOperateClick(v);
+                        mOperate.setImageResource(R.drawable.icon_op_close);
+                    }
+                    break;
             }
 
         }
@@ -93,6 +110,6 @@ public class BottomControlView extends RelativeLayout {
 
         void onGiftClick();
 
-//        void onOperateClick();
+        void onOperateClick(View view);
     }
 }

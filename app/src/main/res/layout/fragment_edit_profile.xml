@@ -40,23 +40,23 @@
                     android:layout_height="45dp"
                     android:layout_marginLeft="5dp" />
             </LinearLayout>
-            <com.neusoft.besterlive.control.view.EditProfile
+            <com.neusoft.besterlive.view.weight.EditProfile
                 android:id="@+id/nick_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.EditProfile
+            <com.neusoft.besterlive.view.weight.EditProfile
                 android:id="@+id/gender"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.EditProfile
+            <com.neusoft.besterlive.view.weight.EditProfile
                 android:id="@+id/sign"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.EditProfile
+            <com.neusoft.besterlive.view.weight.EditProfile
                 android:id="@+id/renzhen"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.EditProfile
+            <com.neusoft.besterlive.view.weight.EditProfile
                 android:id="@+id/location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -64,19 +64,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="1px"
                 android:background="#333" />
-            <com.neusoft.besterlive.control.view.TextProfile
+            <com.neusoft.besterlive.view.TextProfile
                 android:id="@+id/id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.TextProfile
+            <com.neusoft.besterlive.view.TextProfile
                 android:id="@+id/level"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.TextProfile
+            <com.neusoft.besterlive.view.TextProfile
                 android:id="@+id/get"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <com.neusoft.besterlive.control.view.TextProfile
+            <com.neusoft.besterlive.view.TextProfile
                 android:id="@+id/send"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>

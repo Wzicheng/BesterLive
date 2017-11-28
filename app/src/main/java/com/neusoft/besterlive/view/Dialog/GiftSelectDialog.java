@@ -1,4 +1,4 @@
-package com.neusoft.besterlive.control.view;
+package com.neusoft.besterlive.view.Dialog;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -18,9 +18,9 @@ import android.widget.ImageView;
 
 import com.google.gson.Gson;
 import com.neusoft.besterlive.R;
-import com.neusoft.besterlive.control.widget.TransParentNoDialog;
 import com.neusoft.besterlive.model.bean.GiftInfo;
 import com.neusoft.besterlive.model.bean.IMConstants;
+import com.neusoft.besterlive.view.GiftGridView;
 import com.tencent.ilivesdk.core.ILiveRoomManager;
 import com.tencent.livesdk.ILVCustomCmd;
 import com.tencent.livesdk.ILVText;

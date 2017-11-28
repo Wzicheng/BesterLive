@@ -1,4 +1,4 @@
-package com.neusoft.besterlive.control.widget;
+package com.neusoft.besterlive.view.Dialog;
 
 import android.app.Activity;
 import android.view.Gravity;

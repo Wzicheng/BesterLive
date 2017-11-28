@@ -7,20 +7,16 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 
 import com.neusoft.besterlive.BesterApplication;
-import com.neusoft.besterlive.control.widget.PicChooseDialog;
+import com.neusoft.besterlive.view.Dialog.PicChooseDialog;
 import com.qiniu.android.http.ResponseInfo;
-import com.tencent.TIMFriendshipManager;
 import com.tencent.TIMUserProfile;
 
 import java.io.File;
 import java.io.IOException;
-
-import static com.neusoft.besterlive.R.style.dialog;
 
 
 /**

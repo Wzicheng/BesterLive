@@ -1,4 +1,4 @@
-package com.neusoft.besterlive.control.view;
+package com.neusoft.besterlive.view.Dialog;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -7,7 +7,6 @@ import android.view.WindowManager;
 import android.widget.RadioButton;
 
 import com.neusoft.besterlive.R;
-import com.neusoft.besterlive.control.widget.TransParentDialog;
 
 /**
  * Created by Wzich on 2017/10/30.
