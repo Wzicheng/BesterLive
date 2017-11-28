@@ -87,7 +87,7 @@ public class LoginActivity extends Activity {
             return;
         }
 
-        // TODO validate success, do something
+        // 基本校验完成
 
         Login(account,password);
 

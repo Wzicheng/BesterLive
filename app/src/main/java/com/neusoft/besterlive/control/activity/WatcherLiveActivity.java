@@ -22,6 +22,7 @@ import com.neusoft.besterlive.view.GiftFullView;
 import com.neusoft.besterlive.view.GiftRepeatView;
 import com.neusoft.besterlive.view.Dialog.GiftSelectDialog;
 import com.neusoft.besterlive.view.MsgListView;
+import com.neusoft.besterlive.view.TitleView;
 import com.neusoft.besterlive.view.weight.SizeChangeRelativeLayout;
 import com.neusoft.besterlive.model.bean.CustomProfile;
 import com.neusoft.besterlive.model.bean.GiftInfo;
@@ -40,15 +41,21 @@ import com.tencent.ilivesdk.core.ILiveRoomManager;
 import com.tencent.ilivesdk.view.AVRootView;
 import com.tencent.livesdk.ILVCustomCmd;
 import com.tencent.livesdk.ILVLiveConfig;
+import com.tencent.livesdk.ILVLiveConstants;
 import com.tencent.livesdk.ILVLiveManager;
 import com.tencent.livesdk.ILVLiveRoomOption;
 import com.tencent.livesdk.ILVText;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import tyrantgit.widget.HeartLayout;
+
+import static com.tencent.qalsdk.base.a.ca;
+import static com.tencent.qalsdk.base.a.cu;
 
 /**
  * Created by Wzich on 2017/11/12.
@@ -57,6 +64,7 @@ import tyrantgit.widget.HeartLayout;
 public class WatcherLiveActivity extends AppCompatActivity {
     private SizeChangeRelativeLayout mActivityHostLive;
     private AVRootView mLiveView;
+    private TitleView mTitleView;
     private BottomControlView mBottomControlView;
     private MsgListView mMsgListView;
     private HeartLayout mHeartLayout;
@@ -64,11 +72,13 @@ public class WatcherLiveActivity extends AppCompatActivity {
     private DanMuView mDanMuView;
     private ChatView mChatView;
     private GiftFullView mGiftFullView;
-    private int roomId;
-    private String userId;
 
     private Timer heartTimer = new Timer();
     private Random colorRandom = new Random();
+
+    private int roomId;
+    private String userId;
+    private String hostId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,7 +95,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
             finish();
             return;
         }
-        final String hostId = getIntent().getStringExtra("hostId");
+        hostId = getIntent().getStringExtra("hostId");
         //加入房间配置项
         ILVLiveRoomOption memberOption = new ILVLiveRoomOption(hostId)
                 .controlRole("Guest")   //设置角色
@@ -98,6 +108,38 @@ public class WatcherLiveActivity extends AppCompatActivity {
         ILVLiveManager.getInstance().joinRoom(roomId, memberOption, new ILiveCallBack() {
             @Override
             public void onSuccess(Object data) {
+                //根据hostId获取主播信息
+                final List<String> userId = new ArrayList<>();
+                userId.add(hostId);
+                TIMFriendshipManager.getInstance().getUsersProfile(userId, new TIMValueCallBack<List<TIMUserProfile>>() {
+                    @Override
+                    public void onError(int i, String s) {
+                        Toast.makeText(WatcherLiveActivity.this, "获取主播信息失败", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onSuccess(List<TIMUserProfile> userProfiles) {
+                        mTitleView.setHost(userProfiles.get(0));
+                    }
+                });
+                mTitleView.addNewWatcher(BesterApplication.getApp().getSelfProfile());
+
+                ILVCustomCmd customCmd = new ILVCustomCmd();
+                customCmd.setType(ILVText.ILVTextType.eGroupMsg);
+                customCmd.setCmd(ILVLiveConstants.ILVLIVE_CMD_ENTER);
+                customCmd.setDestId(ILiveRoomManager.getInstance().getIMGroupId());
+                ILVLiveManager.getInstance().sendCustomCmd(customCmd, new ILiveCallBack() {
+                    @Override
+                    public void onSuccess(Object data) {
+
+                    }
+
+                    @Override
+                    public void onError(String module, int errCode, String errMsg) {
+
+                    }
+                });
+
                 //加入房间成功，显示心形欢迎动画
                 heartTimer.scheduleAtFixedRate(new TimerTask() {
                     @Override
@@ -111,6 +153,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
             public void onError(String module, int errCode, String errMsg) {
                 //加入房间失败
                 Toast.makeText(WatcherLiveActivity.this, "加入房间失败", Toast.LENGTH_SHORT).show();
+                quitRoom();
             }
         });
     }
@@ -147,6 +190,9 @@ public class WatcherLiveActivity extends AppCompatActivity {
                 mChatView.setVisibility(View.INVISIBLE);
             }
         });
+
+        //顶部信息显示窗口
+        mTitleView = (TitleView) findViewById(R.id.title_view);
 
         //心形点赞窗口
         mHeartLayout = (HeartLayout) findViewById(R.id.heart_layout);
@@ -212,6 +258,19 @@ public class WatcherLiveActivity extends AppCompatActivity {
                             mGiftRepeateView.showGiftMsg(giftInfo,cmdInfo.repeatId,BesterApplication.getApp().getSelfProfile());
                         } else if (giftInfo.type == GiftInfo.Type.FullScreenGift){
                             mGiftFullView.showGift(giftInfo,BesterApplication.getApp().getSelfProfile());
+                        }
+                    case ILVLiveConstants.ILVLIVE_CMD_ENTER:
+                        //新用户加入房间
+                        mTitleView.addNewWatcher(userProfile);
+                        break;
+
+                    case ILVLiveConstants.ILVLIVE_CMD_LEAVE:
+                        //有用户退出房间
+                        if (userProfile.getIdentifier().equals(hostId)){
+                            //主播退出房间，关闭直播窗口
+                            quitRoom();
+                        } else {
+                            mTitleView.userQuitRoom(userProfile);
                         }
                 }
             }
@@ -432,17 +491,33 @@ public class WatcherLiveActivity extends AppCompatActivity {
 
     private void quitRoom() {
         //退出房间
-        ILVLiveManager.getInstance().quitRoom(new ILiveCallBack() {
+        ILVCustomCmd customCmd = new ILVCustomCmd();
+        customCmd.setType(ILVText.ILVTextType.eGroupMsg);
+        customCmd.setCmd(ILVLiveConstants.ILVLIVE_CMD_LEAVE);
+        customCmd.setDestId(ILiveRoomManager.getInstance().getIMGroupId());
+        ILVLiveManager.getInstance().sendCustomCmd(customCmd, new ILiveCallBack() {
             @Override
             public void onSuccess(Object data) {
-                Toast.makeText(WatcherLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
+                ILVLiveManager.getInstance().quitRoom(new ILiveCallBack() {
+                    @Override
+                    public void onSuccess(Object data) {
+                        ;
+                        Toast.makeText(WatcherLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(String module, int errCode, String errMsg) {
+                        Toast.makeText(WatcherLiveActivity.this, "退出房间失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onError(String module, int errCode, String errMsg) {
-                Toast.makeText(WatcherLiveActivity.this, "退出房间失败", Toast.LENGTH_SHORT).show();
+
             }
         });
+
     }
 
     // 保存更新信息

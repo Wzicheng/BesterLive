@@ -81,7 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // TODO validate success, do something
+        // validate success, do something
         ILiveLoginManager.getInstance().tlsRegister(account, password, new ILiveCallBack() {
             @Override
             public void onSuccess(Object data) {

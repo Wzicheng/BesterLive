@@ -82,7 +82,7 @@ public class MsgListAdapter extends BaseAdapter {
 
         private void bindMsgInfo(MsgInfo msgInfo) {
             int level = msgInfo.userLevel;
-            //TODO 不同的level显示不同的levelIcon
+            //不同的level显示不同的levelIcon
             mIvLevelIcon.setImageResource(R.drawable.level_1);
             SpannableStringBuilder ssb = new SpannableStringBuilder("");
             {

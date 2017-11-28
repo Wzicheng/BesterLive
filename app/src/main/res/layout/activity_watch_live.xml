@@ -9,6 +9,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <com.neusoft.besterlive.view.TitleView
+        android:id="@+id/title_view"
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </com.neusoft.besterlive.view.TitleView>
+
+
     <com.neusoft.besterlive.view.BottomControlView
         android:id="@+id/bottom_control_view"
         android:layout_width="match_parent"

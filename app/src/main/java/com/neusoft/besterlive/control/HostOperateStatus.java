@@ -18,7 +18,7 @@ public class HostOperateStatus {
     public void switchBeauty(){
         isBeauty = !isBeauty;
         if (isBeauty){
-            ILiveRoomManager.getInstance().enableBeauty(1.0f);
+            ILiveRoomManager.getInstance().enableBeauty(2.0f);
         } else {
             ILiveRoomManager.getInstance().enableBeauty(0);
         }

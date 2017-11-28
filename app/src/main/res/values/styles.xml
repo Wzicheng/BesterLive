@@ -17,6 +17,7 @@
         <item name="android:windowBackground">@android:color/transparent</item><!--背景透明-->
         <item name="android:backgroundDimEnabled">true</item><!--模糊-->
     </style>
+
     <!-- Gift Dialog-->
     <style name="dialog_nodim" parent="@android:style/Theme.Dialog">
         <item name="android:windowFrame">@null</item><!--边框-->

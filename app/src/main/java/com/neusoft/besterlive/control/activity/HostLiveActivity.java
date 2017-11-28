@@ -23,6 +23,7 @@ import com.neusoft.besterlive.view.GiftFullView;
 import com.neusoft.besterlive.view.GiftRepeatView;
 import com.neusoft.besterlive.view.Dialog.GiftSelectDialog;
 import com.neusoft.besterlive.view.MsgListView;
+import com.neusoft.besterlive.view.TitleView;
 import com.neusoft.besterlive.view.weight.SizeChangeRelativeLayout;
 import com.neusoft.besterlive.model.bean.CustomProfile;
 import com.neusoft.besterlive.model.bean.GiftInfo;
@@ -42,6 +43,7 @@ import com.tencent.ilivesdk.core.ILiveLoginManager;
 import com.tencent.ilivesdk.view.AVRootView;
 import com.tencent.livesdk.ILVCustomCmd;
 import com.tencent.livesdk.ILVLiveConfig;
+import com.tencent.livesdk.ILVLiveConstants;
 import com.tencent.livesdk.ILVLiveManager;
 import com.tencent.livesdk.ILVLiveRoomOption;
 import com.tencent.livesdk.ILVText;
@@ -52,6 +54,8 @@ import java.util.TimerTask;
 
 import tyrantgit.widget.HeartLayout;
 
+import static com.tencent.qalsdk.base.a.ca;
+
 /**
  * Created by Wzich on 2017/11/13.
  */
@@ -59,6 +63,7 @@ import tyrantgit.widget.HeartLayout;
 public class HostLiveActivity extends AppCompatActivity {
     private SizeChangeRelativeLayout mActivityHostLive;
     private AVRootView mLiveView;
+    private TitleView mTitleView;
     private BottomControlView mBottomControlView;
     private MsgListView mMsgListView;
     private HeartLayout mHeartLayout;
@@ -101,6 +106,9 @@ public class HostLiveActivity extends AppCompatActivity {
         ILVLiveManager.getInstance().createRoom(roomId, hostOption, new ILiveCallBack() {
             @Override
             public void onSuccess(Object data) {
+                //创建房间成功后将主播信息传递到TitleView
+                mTitleView.setHost(BesterApplication.getApp().getSelfProfile());
+
                 //创建直播房间成功，显示心形欢迎动画
                 heartTimer.scheduleAtFixedRate(new TimerTask() {
                     @Override
@@ -142,6 +150,10 @@ public class HostLiveActivity extends AppCompatActivity {
             }
         });
 
+        //顶部信息显示窗口
+        mTitleView = (TitleView) findViewById(R.id.title_view);
+
+
         //视频直播窗口
         mLiveView = (AVRootView) findViewById(R.id.live_view);
 
@@ -182,7 +194,15 @@ public class HostLiveActivity extends AppCompatActivity {
                         } else if (giftInfo.type == GiftInfo.Type.FullScreenGift){
                             getGift(giftInfo);
                             mGiftFullView.showGift(giftInfo,BesterApplication.getApp().getSelfProfile());
-                        }
+                      }
+                    case ILVLiveConstants.ILVLIVE_CMD_ENTER:
+                        //用户加入直播间
+                        mTitleView.addNewWatcher(userProfile);
+                        break;
+                    case ILVLiveConstants.ILVLIVE_CMD_LEAVE:
+                        //用户离开房间
+                        mTitleView.userQuitRoom(userProfile);
+                        break;
                 }
             }
 
@@ -412,17 +432,32 @@ public class HostLiveActivity extends AppCompatActivity {
     }
 
     private void quitRoom() {
-        ILVLiveManager.getInstance().quitRoom(new ILiveCallBack() {
+        Toast.makeText(HostLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
+        ILVCustomCmd customCmd = new ILVCustomCmd();
+        customCmd.setType(ILVText.ILVTextType.eGroupMsg);
+        customCmd.setCmd(ILVLiveConstants.ILVLIVE_CMD_LEAVE);
+        ILVLiveManager.getInstance().sendCustomCmd(customCmd, new ILiveCallBack() {
             @Override
             public void onSuccess(Object data) {
-                Toast.makeText(HostLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
+                ILVLiveManager.getInstance().quitRoom(new ILiveCallBack() {
+                    @Override
+                    public void onSuccess(Object data) {
+
+                    }
+
+                    @Override
+                    public void onError(String module, int errCode, String errMsg) {
+                        Toast.makeText(HostLiveActivity.this, "退出房间失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onError(String module, int errCode, String errMsg) {
-                Toast.makeText(HostLiveActivity.this, "退出房间失败", Toast.LENGTH_SHORT).show();
+
             }
         });
+
     }
 
     // 保存更新信息
