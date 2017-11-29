@@ -153,7 +153,8 @@ public class WatcherLiveActivity extends AppCompatActivity {
             public void onError(String module, int errCode, String errMsg) {
                 //加入房间失败
                 Toast.makeText(WatcherLiveActivity.this, "加入房间失败", Toast.LENGTH_SHORT).show();
-                quitRoom();
+                quitRoom(false);
+                finish();
             }
         });
     }
@@ -231,7 +232,6 @@ public class WatcherLiveActivity extends AppCompatActivity {
 
             @Override
             public void onNewCustomMsg(ILVCustomCmd cmd, String id, TIMUserProfile userProfile) {
-
                 switch (cmd.getCmd()){
                     case IMConstants.CMD_MSG_LIST: //来自信息
                         MsgInfo msgInfo = getMsgInfo(cmd, userProfile);
@@ -268,7 +268,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
                         //有用户退出房间
                         if (userProfile.getIdentifier().equals(hostId)){
                             //主播退出房间，关闭直播窗口
-                            quitRoom();
+                            quitRoom(true);
                         } else {
                             mTitleView.userQuitRoom(userProfile);
                         }
@@ -446,8 +446,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
                 TIMUserProfile timSelfprofile = BesterApplication.getApp().getSelfProfile();
                 msgInfo.userId = timSelfprofile.getIdentifier();
                 msgInfo.userLevel = Integer.valueOf(EditProfileFragment.getValue(
-                        timSelfprofile.getCustomInfo(),CustomProfile.CUSTOM_LEVEL,"1"
-                ));
+                        timSelfprofile.getCustomInfo(),CustomProfile.CUSTOM_LEVEL,"1"));
                 String userNick = timSelfprofile.getNickName();
                 if (TextUtils.isEmpty(userNick)){
                     userNick = timSelfprofile.getIdentifier();
@@ -486,10 +485,11 @@ public class WatcherLiveActivity extends AppCompatActivity {
         super.onDestroy();
         //避免内存泄漏
         heartTimer.cancel();
-        quitRoom();
+        quitRoom(false);
     }
 
-    private void quitRoom() {
+    private void quitRoom(boolean isFromHost) {
+        boolean fromHost = isFromHost;
         //退出房间
         ILVCustomCmd customCmd = new ILVCustomCmd();
         customCmd.setType(ILVText.ILVTextType.eGroupMsg);
@@ -501,8 +501,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
                 ILVLiveManager.getInstance().quitRoom(new ILiveCallBack() {
                     @Override
                     public void onSuccess(Object data) {
-                        ;
-                        Toast.makeText(WatcherLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
+
                     }
 
                     @Override
@@ -517,6 +516,11 @@ public class WatcherLiveActivity extends AppCompatActivity {
 
             }
         });
+        if (fromHost){
+            Toast.makeText(WatcherLiveActivity.this, "该主播已结束直播，自动退出房间！", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(WatcherLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
+        }
 
     }
 

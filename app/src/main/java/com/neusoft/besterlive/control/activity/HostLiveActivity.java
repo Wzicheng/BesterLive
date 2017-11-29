@@ -87,8 +87,8 @@ public class HostLiveActivity extends AppCompatActivity {
     }
 
     private void createRoom() {
-        roomId = getIntent().getIntExtra("roomId",-1);
-        if (roomId < 0){
+        roomId = getIntent().getIntExtra("roomId", -1);
+        if (roomId < 0) {
             Toast.makeText(this.getApplicationContext(), "房间ID异常", Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -115,7 +115,7 @@ public class HostLiveActivity extends AppCompatActivity {
                     public void run() {
                         showHeartAnim();
                     }
-                },0,1000);
+                }, 0, 1000);
 
             }
 
@@ -128,8 +128,8 @@ public class HostLiveActivity extends AppCompatActivity {
 
     //获取心形动画随机颜色
     private int getRandomColor() {
-        int randomColor = Color.rgb(colorRandom.nextInt(255),colorRandom.nextInt(255)
-            ,colorRandom.nextInt(255));
+        int randomColor = Color.rgb(colorRandom.nextInt(255), colorRandom.nextInt(255)
+                , colorRandom.nextInt(255));
         return randomColor;
     }
 
@@ -167,34 +167,34 @@ public class HostLiveActivity extends AppCompatActivity {
 
             @Override
             public void onNewCustomMsg(ILVCustomCmd cmd, String id, TIMUserProfile userProfile) {
-                MsgInfo msgInfo = getMsgInfo(cmd, userProfile);
-                switch (cmd.getCmd()){
-                   case IMConstants.CMD_MSG_LIST: //来自信息
-                       showHeartAnim();
-                       break;
-
-                   case IMConstants.CMD_MSG_DANMU: //来自弹幕
-                       mMsgListView.addMsg(msgInfo);
-                       mDanMuView.showMsgDanMu(msgInfo);
-                       break;
-
+                switch (cmd.getCmd()) {
+                    case IMConstants.CMD_MSG_LIST: //来自信息
+                        MsgInfo msgInfo = getMsgInfo(cmd, userProfile);
+                        mMsgListView.addMsg(msgInfo);
+                        break;
+                    case IMConstants.CMD_MSG_DANMU: //来自弹幕
+                        MsgInfo msgDanmuInfo = getMsgInfo(cmd, userProfile);
+                        mMsgListView.addMsg(msgDanmuInfo);
+                        mDanMuView.showMsgDanMu(msgDanmuInfo);
+                        break;
                     case IMConstants.CMD_MGS_GIFT: //来自礼物
                         //显示动画
                         GiftSelectDialog.GiftCmdInfo cmdInfo = new Gson().fromJson(cmd.getParam()
-                                ,GiftSelectDialog.GiftCmdInfo.class);
-                        if (cmdInfo == null){
+                                , GiftSelectDialog.GiftCmdInfo.class);
+                        if (cmdInfo == null) {
                             return;
                         }
                         GiftInfo giftInfo = GiftInfo.getGiftById(cmdInfo.giftId);
-                        if (giftInfo.giftId == GiftInfo.Gift_Heart.giftId){
+                        if (giftInfo.giftId == GiftInfo.Gift_Heart.giftId) {
                             mHeartLayout.addHeart(getRandomColor());
-                        } else if (giftInfo.type == GiftInfo.Type.ContinueGift){
+                        } else if (giftInfo.type == GiftInfo.Type.ContinueGift) {
                             getGift(giftInfo);
-                            mGiftRepeateView.showGiftMsg(giftInfo,cmdInfo.repeatId,BesterApplication.getApp().getSelfProfile());
-                        } else if (giftInfo.type == GiftInfo.Type.FullScreenGift){
+                            mGiftRepeateView.showGiftMsg(giftInfo, cmdInfo.repeatId, BesterApplication.getApp().getSelfProfile());
+                        } else if (giftInfo.type == GiftInfo.Type.FullScreenGift) {
                             getGift(giftInfo);
-                            mGiftFullView.showGift(giftInfo,BesterApplication.getApp().getSelfProfile());
-                      }
+                            mGiftFullView.showGift(giftInfo, BesterApplication.getApp().getSelfProfile());
+                        }
+                        break;
                     case ILVLiveConstants.ILVLIVE_CMD_ENTER:
                         //用户加入直播间
                         mTitleView.addNewWatcher(userProfile);
@@ -315,7 +315,7 @@ public class HostLiveActivity extends AppCompatActivity {
 
     private void refreshIcon(HostControlDialog hostControlDialog) {
         hostControlDialog.setStatusIcon(mHostOperateStatus.isBeauty(),
-                mHostOperateStatus.isFlashLight(),mHostOperateStatus.isVoice());
+                mHostOperateStatus.isFlashLight(), mHostOperateStatus.isVoice());
     }
 
     private void getGift(GiftInfo giftInfo) {
@@ -368,16 +368,17 @@ public class HostLiveActivity extends AppCompatActivity {
         msgInfo.msgContent = cmd.getParam();
         msgInfo.userId = userProfile.getIdentifier();
         msgInfo.userLevel = Integer.valueOf(EditProfileFragment.getValue(
-                userProfile.getCustomInfo(), CustomProfile.CUSTOM_LEVEL,"1"
+                userProfile.getCustomInfo(), CustomProfile.CUSTOM_LEVEL, "1"
         ));
         String userNick = userProfile.getNickName();
-        if (TextUtils.isEmpty(userNick)){
+        if (TextUtils.isEmpty(userNick)) {
             userNick = userProfile.getIdentifier();
         }
         msgInfo.userNick = userNick;
         msgInfo.userAvatar = userProfile.getFaceUrl();
         return msgInfo;
     }
+
     //发送聊天消息
     private void sendChatMsg(final ILVCustomCmd customCmd) {
         ILVLiveManager.getInstance().sendCustomCmd(customCmd, new ILiveCallBack<TIMMessage>() {
@@ -388,10 +389,10 @@ public class HostLiveActivity extends AppCompatActivity {
                 TIMUserProfile timSelfprofile = BesterApplication.getApp().getSelfProfile();
                 msgInfo.userId = timSelfprofile.getIdentifier();
                 msgInfo.userLevel = Integer.valueOf(EditProfileFragment.getValue(
-                        timSelfprofile.getCustomInfo(),CustomProfile.CUSTOM_LEVEL,"1"
+                        timSelfprofile.getCustomInfo(), CustomProfile.CUSTOM_LEVEL, "1"
                 ));
                 String userNick = timSelfprofile.getNickName();
-                if (TextUtils.isEmpty(userNick)){
+                if (TextUtils.isEmpty(userNick)) {
                     userNick = timSelfprofile.getIdentifier();
                 }
                 msgInfo.userNick = userNick;
@@ -432,7 +433,6 @@ public class HostLiveActivity extends AppCompatActivity {
     }
 
     private void quitRoom() {
-        Toast.makeText(HostLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
         ILVCustomCmd customCmd = new ILVCustomCmd();
         customCmd.setType(ILVText.ILVTextType.eGroupMsg);
         customCmd.setCmd(ILVLiveConstants.ILVLIVE_CMD_LEAVE);
@@ -442,7 +442,7 @@ public class HostLiveActivity extends AppCompatActivity {
                 ILVLiveManager.getInstance().quitRoom(new ILiveCallBack() {
                     @Override
                     public void onSuccess(Object data) {
-
+                        Toast.makeText(HostLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override

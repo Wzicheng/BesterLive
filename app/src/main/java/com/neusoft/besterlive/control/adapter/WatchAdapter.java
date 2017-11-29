@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -59,9 +60,11 @@ public class WatchAdapter extends RecyclerView.Adapter {
 
     private class WatcherHolder extends RecyclerView.ViewHolder {
         private ImageView mWatcherAvatar;
+        private FrameLayout mFlAvatar;
         public WatcherHolder(View itemView) {
             super(itemView);
             mWatcherAvatar = (ImageView) itemView.findViewById(R.id.watcher_avatar);
+            mFlAvatar = (FrameLayout) itemView.findViewById(R.id.fl_avatar);
         }
 
         public void bindData(TIMUserProfile userProfile) {
@@ -71,11 +74,12 @@ public class WatchAdapter extends RecyclerView.Adapter {
             } else {
                 ImgUtils.loadRound(avatarUrl,mWatcherAvatar);
             }
-            mWatcherAvatar.setTag(userProfile);
+            mFlAvatar.setTag(userProfile);
+
             mWatcherAvatar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    TIMUserProfile userProfileTag = (TIMUserProfile) mWatcherAvatar.getTag();
+                    TIMUserProfile userProfileTag = (TIMUserProfile) mFlAvatar.getTag();
                     //显示用户详情对话框
                     showUserInfoDialog(userProfileTag.getIdentifier());
                 }
