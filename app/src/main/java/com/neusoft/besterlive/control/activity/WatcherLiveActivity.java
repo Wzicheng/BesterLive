@@ -14,6 +14,9 @@ import com.google.gson.Gson;
 import com.neusoft.besterlive.BesterApplication;
 import com.neusoft.besterlive.R;
 import com.neusoft.besterlive.control.fragment.EditProfileFragment;
+import com.neusoft.besterlive.control.http.request.GetWatchersRequest;
+import com.neusoft.besterlive.control.http.request.JoinRoomRequest;
+import com.neusoft.besterlive.control.http.request.QuitRoomRequest;
 import com.neusoft.besterlive.control.http.request.SendGiftRequest;
 import com.neusoft.besterlive.view.BottomControlView;
 import com.neusoft.besterlive.view.ChatView;
@@ -23,6 +26,7 @@ import com.neusoft.besterlive.view.GiftRepeatView;
 import com.neusoft.besterlive.view.Dialog.GiftSelectDialog;
 import com.neusoft.besterlive.view.MsgListView;
 import com.neusoft.besterlive.view.TitleView;
+import com.neusoft.besterlive.view.WatcherEnterView;
 import com.neusoft.besterlive.view.weight.SizeChangeRelativeLayout;
 import com.neusoft.besterlive.model.bean.CustomProfile;
 import com.neusoft.besterlive.model.bean.GiftInfo;
@@ -49,13 +53,11 @@ import com.tencent.livesdk.ILVText;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import tyrantgit.widget.HeartLayout;
-
-import static com.tencent.qalsdk.base.a.ca;
-import static com.tencent.qalsdk.base.a.cu;
 
 /**
  * Created by Wzich on 2017/11/12.
@@ -65,6 +67,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
     private SizeChangeRelativeLayout mActivityHostLive;
     private AVRootView mLiveView;
     private TitleView mTitleView;
+    private WatcherEnterView mWatchEnterView;
     private BottomControlView mBottomControlView;
     private MsgListView mMsgListView;
     private HeartLayout mHeartLayout;
@@ -77,7 +80,6 @@ public class WatcherLiveActivity extends AppCompatActivity {
     private Random colorRandom = new Random();
 
     private int roomId;
-    private String userId;
     private String hostId;
 
     @Override
@@ -88,6 +90,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
         joinRoom();
     }
 
+    //加入房间
     private void joinRoom() {
         roomId = getIntent().getIntExtra("roomId",-1);
         if (roomId < 0){
@@ -95,6 +98,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
             finish();
             return;
         }
+
         hostId = getIntent().getStringExtra("hostId");
         //加入房间配置项
         ILVLiveRoomOption memberOption = new ILVLiveRoomOption(hostId)
@@ -122,6 +126,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
                         mTitleView.setHost(userProfiles.get(0));
                     }
                 });
+
                 mTitleView.addNewWatcher(BesterApplication.getApp().getSelfProfile());
 
                 ILVCustomCmd customCmd = new ILVCustomCmd();
@@ -147,6 +152,31 @@ public class WatcherLiveActivity extends AppCompatActivity {
                         showHeartAnim();
                     }
                 },0,1000);
+
+                //调用后台接口，更新房间信息
+                JoinRoomRequest request = new JoinRoomRequest();
+                JoinRoomRequest.JoinRoomParam param = new JoinRoomRequest.JoinRoomParam();
+                param.roomId = roomId;
+                param.userId = BesterApplication.getApp().getSelfProfile().getIdentifier();
+                request.request(param);
+
+                //获取当前房间正在观看的观众信息
+                GetWatchersRequest getWatchersRequest = new GetWatchersRequest();
+                getWatchersRequest.setOnResultListener(new BaseRequest.OnResultListener<Set<String>>() {
+                    @Override
+                    public void onFail(int code, String msg) {
+                        Toast.makeText(WatcherLiveActivity.this, "获取房间内观众信息失败！", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onSuccess(Set<String> ids) {
+                        getWatchersProfile(ids);
+                    }
+                });
+                GetWatchersRequest.GetWatchersParam getWatchersParam = new GetWatchersRequest.GetWatchersParam();
+                getWatchersParam.roomId = roomId;
+                getWatchersRequest.request(getWatchersParam);
+                BesterApplication.getApp().startHeartBeat(roomId);
             }
 
             @Override
@@ -154,9 +184,31 @@ public class WatcherLiveActivity extends AppCompatActivity {
                 //加入房间失败
                 Toast.makeText(WatcherLiveActivity.this, "加入房间失败", Toast.LENGTH_SHORT).show();
                 quitRoom(false);
-                finish();
             }
         });
+    }
+
+    //获房间内观众信息
+    private void getWatchersProfile(Set<String> ids) {
+        if(ids == null || ids.isEmpty()){
+            return;
+        }
+
+        List<String> usersId = new ArrayList<>();
+        usersId.addAll(ids);
+        for (String userId : usersId) {
+            TIMFriendshipManager.getInstance().getUsersProfile(usersId, new TIMValueCallBack<List<TIMUserProfile>>() {
+                @Override
+                public void onError(int i, String s) {
+
+                }
+
+                @Override
+                public void onSuccess(List<TIMUserProfile> userProfileList) {
+                    mTitleView.addWatchers(userProfileList);
+                }
+            });
+        }
     }
 
     //显示心形动画
@@ -176,6 +228,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
         return randomColor;
     }
 
+    //初始化各控件
     private void initView() {
         //对整个RelativeLayout进行监听
         mActivityHostLive = (SizeChangeRelativeLayout) findViewById(R.id.activity_watch_live);
@@ -194,6 +247,9 @@ public class WatcherLiveActivity extends AppCompatActivity {
 
         //顶部信息显示窗口
         mTitleView = (TitleView) findViewById(R.id.title_view);
+
+        //用户进入提示窗口
+        mWatchEnterView = (WatcherEnterView) findViewById(R.id.watch_enter_view);
 
         //心形点赞窗口
         mHeartLayout = (HeartLayout) findViewById(R.id.heart_layout);
@@ -259,9 +315,12 @@ public class WatcherLiveActivity extends AppCompatActivity {
                         } else if (giftInfo.type == GiftInfo.Type.FullScreenGift){
                             mGiftFullView.showGift(giftInfo,BesterApplication.getApp().getSelfProfile());
                         }
+                        break;
+
                     case ILVLiveConstants.ILVLIVE_CMD_ENTER:
                         //新用户加入房间
                         mTitleView.addNewWatcher(userProfile);
+                        mWatchEnterView.showEnterWatcher(userProfile);
                         break;
 
                     case ILVLiveConstants.ILVLIVE_CMD_LEAVE:
@@ -293,6 +352,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
             @Override
             public void onCloseClick() {
                 //点击关闭直播
+                quitRoom(false);
                 finish();
             }
 
@@ -346,6 +406,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
         mChatView.setVisibility(View.INVISIBLE);
     }
 
+    //发送礼物信息
     private void sendGiftMsg(final ILVCustomCmd customCmd) {
         //发送礼物消息
         ILVLiveManager.getInstance().sendCustomCmd(customCmd, new ILiveCallBack<TIMMessage>() {
@@ -376,6 +437,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
         });
     }
 
+    //发送礼物后的经验值处理
     private void sendGift(GiftInfo giftInfo) {
         SendGiftRequest request = new SendGiftRequest();
         request.setOnResultListener(new BaseRequest.OnResultListener<UserInfo>() {
@@ -419,14 +481,14 @@ public class WatcherLiveActivity extends AppCompatActivity {
         request.request(param);
     }
 
+    //获取接收到的信息
     @NonNull
     private MsgInfo getMsgInfo(ILVCustomCmd cmd, TIMUserProfile userProfile) {
         MsgInfo msgInfo = new MsgInfo();
         msgInfo.msgContent = cmd.getParam();
         msgInfo.userId = userProfile.getIdentifier();
         msgInfo.userLevel = Integer.valueOf(EditProfileFragment.getValue(
-                userProfile.getCustomInfo(), CustomProfile.CUSTOM_LEVEL,"1"
-        ));
+                userProfile.getCustomInfo(), CustomProfile.CUSTOM_LEVEL,"1"));
         String userNick = userProfile.getNickName();
         if (TextUtils.isEmpty(userNick)){
             userNick = userProfile.getIdentifier();
@@ -436,6 +498,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
         return msgInfo;
     }
 
+    //发送聊天信息
     private void sendChatMsg(final ILVCustomCmd customCmd) {
         //发送消息
         ILVLiveManager.getInstance().sendCustomCmd(customCmd, new ILiveCallBack<TIMMessage>() {
@@ -488,9 +551,9 @@ public class WatcherLiveActivity extends AppCompatActivity {
         quitRoom(false);
     }
 
+    //退出房间
     private void quitRoom(boolean isFromHost) {
-        boolean fromHost = isFromHost;
-        //退出房间
+        final boolean fromHost = isFromHost;
         ILVCustomCmd customCmd = new ILVCustomCmd();
         customCmd.setType(ILVText.ILVTextType.eGroupMsg);
         customCmd.setCmd(ILVLiveConstants.ILVLIVE_CMD_LEAVE);
@@ -501,7 +564,19 @@ public class WatcherLiveActivity extends AppCompatActivity {
                 ILVLiveManager.getInstance().quitRoom(new ILiveCallBack() {
                     @Override
                     public void onSuccess(Object data) {
+                        if (fromHost){
+                            Toast.makeText(WatcherLiveActivity.this, "该主播已结束直播，自动退出房间！", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(WatcherLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
+                        }
+                        //调用后台接口，更新房间信息
+                        QuitRoomRequest request = new QuitRoomRequest();
+                        QuitRoomRequest.QuitRoomParam param = new QuitRoomRequest.QuitRoomParam();
+                        param.roomId = roomId;
+                        param.userId = BesterApplication.getApp().getSelfProfile().getIdentifier();
+                        request.request(param);
 
+                        BesterApplication.getApp().stopHeartBeat();
                     }
 
                     @Override
@@ -516,12 +591,6 @@ public class WatcherLiveActivity extends AppCompatActivity {
 
             }
         });
-        if (fromHost){
-            Toast.makeText(WatcherLiveActivity.this, "该主播已结束直播，自动退出房间！", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(WatcherLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
-        }
-
     }
 
     // 保存更新信息

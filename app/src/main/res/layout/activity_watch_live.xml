@@ -17,6 +17,13 @@
 
     </com.neusoft.besterlive.view.TitleView>
 
+    <com.neusoft.besterlive.view.WatcherEnterView
+        android:id="@+id/watch_enter_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_view">
+
+    </com.neusoft.besterlive.view.WatcherEnterView>
 
     <com.neusoft.besterlive.view.BottomControlView
         android:id="@+id/bottom_control_view"
@@ -52,6 +59,7 @@
         android:id="@+id/gift_repeate_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingLeft="5dp"
         android:layout_above="@id/msg_list_view"
         >
 

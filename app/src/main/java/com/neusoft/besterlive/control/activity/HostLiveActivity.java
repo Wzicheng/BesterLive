@@ -15,6 +15,8 @@ import com.neusoft.besterlive.R;
 import com.neusoft.besterlive.control.HostOperateStatus;
 import com.neusoft.besterlive.control.fragment.EditProfileFragment;
 import com.neusoft.besterlive.control.http.request.GetGiftRequest;
+import com.neusoft.besterlive.control.http.request.JoinRoomRequest;
+import com.neusoft.besterlive.control.http.request.QuitRoomRequest;
 import com.neusoft.besterlive.view.BottomControlView;
 import com.neusoft.besterlive.view.ChatView;
 import com.neusoft.besterlive.view.DanMuView;
@@ -24,6 +26,7 @@ import com.neusoft.besterlive.view.GiftRepeatView;
 import com.neusoft.besterlive.view.Dialog.GiftSelectDialog;
 import com.neusoft.besterlive.view.MsgListView;
 import com.neusoft.besterlive.view.TitleView;
+import com.neusoft.besterlive.view.WatcherEnterView;
 import com.neusoft.besterlive.view.weight.SizeChangeRelativeLayout;
 import com.neusoft.besterlive.model.bean.CustomProfile;
 import com.neusoft.besterlive.model.bean.GiftInfo;
@@ -54,8 +57,6 @@ import java.util.TimerTask;
 
 import tyrantgit.widget.HeartLayout;
 
-import static com.tencent.qalsdk.base.a.ca;
-
 /**
  * Created by Wzich on 2017/11/13.
  */
@@ -64,6 +65,7 @@ public class HostLiveActivity extends AppCompatActivity {
     private SizeChangeRelativeLayout mActivityHostLive;
     private AVRootView mLiveView;
     private TitleView mTitleView;
+    private WatcherEnterView mWatchEnterView;
     private BottomControlView mBottomControlView;
     private MsgListView mMsgListView;
     private HeartLayout mHeartLayout;
@@ -117,6 +119,15 @@ public class HostLiveActivity extends AppCompatActivity {
                     }
                 }, 0, 1000);
 
+                //调用后台接口，更新房间信息
+                JoinRoomRequest request = new JoinRoomRequest();
+                JoinRoomRequest.JoinRoomParam param = new JoinRoomRequest.JoinRoomParam();
+                param.roomId = roomId;
+                param.userId = BesterApplication.getApp().getSelfProfile().getIdentifier();
+                request.request(param);
+
+                BesterApplication.getApp().startHeartBeat(roomId);
+
             }
 
             @Override
@@ -153,6 +164,8 @@ public class HostLiveActivity extends AppCompatActivity {
         //顶部信息显示窗口
         mTitleView = (TitleView) findViewById(R.id.title_view);
 
+        //用户进入提示窗口
+        mWatchEnterView = (WatcherEnterView) findViewById(R.id.watch_enter_view);
 
         //视频直播窗口
         mLiveView = (AVRootView) findViewById(R.id.live_view);
@@ -198,6 +211,7 @@ public class HostLiveActivity extends AppCompatActivity {
                     case ILVLiveConstants.ILVLIVE_CMD_ENTER:
                         //用户加入直播间
                         mTitleView.addNewWatcher(userProfile);
+                        mWatchEnterView.showEnterWatcher(userProfile);
                         break;
                     case ILVLiveConstants.ILVLIVE_CMD_LEAVE:
                         //用户离开房间
@@ -233,6 +247,7 @@ public class HostLiveActivity extends AppCompatActivity {
             @Override
             public void onCloseClick() {
                 //点击关闭直播
+                quitRoom();
                 finish();
             }
 
@@ -457,6 +472,14 @@ public class HostLiveActivity extends AppCompatActivity {
 
             }
         });
+        //调用后台接口，更新房间信息
+        QuitRoomRequest request = new QuitRoomRequest();
+        QuitRoomRequest.QuitRoomParam param = new QuitRoomRequest.QuitRoomParam();
+        param.roomId = roomId;
+        param.userId = BesterApplication.getApp().getSelfProfile().getIdentifier();
+        request.request(param);
+
+        BesterApplication.getApp().stopHeartBeat();
 
     }
 

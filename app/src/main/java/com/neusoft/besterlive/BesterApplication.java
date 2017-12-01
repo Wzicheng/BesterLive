@@ -2,6 +2,7 @@ package com.neusoft.besterlive;
 
 import android.app.Application;
 
+import com.neusoft.besterlive.control.http.request.HeartBeatRequest;
 import com.neusoft.besterlive.model.bean.CustomProfile;
 import com.neusoft.besterlive.utils.QnUploadHelper;
 import com.tencent.TIMManager;
@@ -12,6 +13,8 @@ import com.tencent.livesdk.ILVLiveManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Wzich on 2017/10/27.
@@ -77,5 +80,34 @@ public class BesterApplication extends Application {
 
     public ILVLiveConfig getLiveConfig(){
         return liveConfig;
+    }
+
+    private Timer heartBeatTimer =null;
+
+    public void startHeartBeat(final int roomId){
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                HeartBeatRequest heartBeatRequest = new HeartBeatRequest();
+                HeartBeatRequest.HeartBeatParam param = new HeartBeatRequest.HeartBeatParam();
+                param.roomId = roomId;
+                param.userId = getSelfProfile().getIdentifier();
+                heartBeatRequest.request(param);
+            }
+        };
+        heartBeatTimer = new Timer();
+        heartBeatTimer.scheduleAtFixedRate(task,0,5000);
+    }
+
+    public void stopHeartBeat(){
+        if (heartBeatTimer != null){
+            heartBeatTimer.cancel();
+        }
+    }
+
+    @Override
+    public void onTerminate() {
+        stopHeartBeat();
+        super.onTerminate();
     }
 }

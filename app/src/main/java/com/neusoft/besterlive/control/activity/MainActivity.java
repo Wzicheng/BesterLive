@@ -29,12 +29,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupTab() {
         mFragmentTab.setup(this,getSupportFragmentManager(),R.id.fragment_container);
+
         //直播列表
         TabHost.TabSpec liveListTabSpec = mFragmentTab.newTabSpec("liveList").setIndicator(getIndicatorView(R.drawable.tab_livelist));
         mFragmentTab.addTab(liveListTabSpec, LiveListFragment.class,null);
+
         //创建直播
         TabHost.TabSpec createLiveTabSpec = mFragmentTab.newTabSpec("createLive").setIndicator(getIndicatorView(R.drawable.tab_publish_live));
-        mFragmentTab.addTab(createLiveTabSpec,null,null);
+        mFragmentTab.addTab(createLiveTabSpec, null,null);
 
         //个人信息设置页面
         TabHost.TabSpec editProfileTabSpec = mFragmentTab.newTabSpec("editProfile").setIndicator(getIndicatorView(R.drawable.tab_profile));

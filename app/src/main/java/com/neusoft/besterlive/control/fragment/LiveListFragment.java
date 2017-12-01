@@ -42,12 +42,13 @@ public class LiveListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_live_list,container,false);
-        findAllView(view);
+        findAllViews(view);
         setupTitleBar();
         getLiveRoomList(pageIndex);
         return view;
     }
 
+    //获取房间列表信息
     private void getLiveRoomList(final int pageIndex) {
         GetLiveRoomRequest request = new GetLiveRoomRequest();
         request.setOnResultListener(new BaseRequest.OnResultListener<List<RoomInfo>>() {
@@ -63,11 +64,13 @@ public class LiveListFragment extends Fragment {
                 if (pageIndex == 0){
                     roomInfoList.clear();
                 }
+
                 //添加获取到的新数据
                 if (roomInfos != null){
                     roomInfoList.addAll(roomInfos);
                     adapter.notifyDataSetChanged();
                 }
+                mSwipeRefreshLayout.setRefreshing(false);
             }
         });
         GetLiveRoomRequest.GetLiveRoomListParam param = new GetLiveRoomRequest.GetLiveRoomListParam();
@@ -84,7 +87,7 @@ public class LiveListFragment extends Fragment {
         }
     }
 
-    private void findAllView(View view) {
+    private void findAllViews(View view) {
         mTitlebar = (Toolbar) view.findViewById(R.id.titlebar);
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout_list);
         mLiveListView = (ListView) view.findViewById(R.id.live_list);

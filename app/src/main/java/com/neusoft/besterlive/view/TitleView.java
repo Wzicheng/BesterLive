@@ -136,4 +136,18 @@ public class TitleView extends LinearLayout {
             adapter.notifyDataSetChanged();
         }
     }
+
+    public void addWatchers(List<TIMUserProfile> userProfileList) {
+        if (userProfileList == null) {
+            return;
+        }
+
+        for (TIMUserProfile userProfile : userProfileList) {
+            if (userProfile != null) {
+                watchers.add(userProfile);
+                mWatchersNum.setText(watchers.size() + " 人正在看");
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
 }

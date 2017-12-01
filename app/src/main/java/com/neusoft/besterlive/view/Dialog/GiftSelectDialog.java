@@ -170,7 +170,7 @@ public class GiftSelectDialog extends TransParentNoDialog {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             //构建View
-            final GiftGridView giftGridView = new GiftGridView(activity);
+            GiftGridView giftGridView = new GiftGridView(activity);
             List<GiftInfo> giftInfos = new ArrayList<>();
             int startIndex = position * 8;
             int endIndex = (position + 1) * 8;
@@ -196,7 +196,7 @@ public class GiftSelectDialog extends TransParentNoDialog {
                     for (GiftGridView item : gridViewPages){
                         item.setSelectedGiftInfo(selectedGiftInfo);
                     }
-                    if (giftGridView != null){
+                    if (selectedGiftInfo != null){
                         mSend.setVisibility(View.VISIBLE);
                     } else {
                         mSend.setVisibility(View.INVISIBLE);
