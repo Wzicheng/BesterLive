@@ -248,7 +248,6 @@ public class HostLiveActivity extends AppCompatActivity {
             public void onCloseClick() {
                 //点击关闭直播
                 quitRoom();
-                finish();
             }
 
             @Override
@@ -443,8 +442,8 @@ public class HostLiveActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         //避免内存泄漏
-        heartTimer.cancel();
         quitRoom();
+        heartTimer.cancel();
     }
 
     private void quitRoom() {
@@ -458,6 +457,7 @@ public class HostLiveActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Object data) {
                         Toast.makeText(HostLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
 
                     @Override
@@ -480,7 +480,6 @@ public class HostLiveActivity extends AppCompatActivity {
         request.request(param);
 
         BesterApplication.getApp().stopHeartBeat();
-
     }
 
     // 保存更新信息

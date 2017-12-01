@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.neusoft.besterlive.R;
+import com.neusoft.besterlive.control.activity.WatcherLiveActivity;
 import com.neusoft.besterlive.control.adapter.WatchAdapter;
 import com.neusoft.besterlive.utils.ImgUtils;
 import com.neusoft.besterlive.view.Dialog.ShowUserInfoDialog;

@@ -132,7 +132,7 @@ public class WatcherEnterView extends RelativeLayout {
         if (TextUtils.isEmpty(userName)){
             userName = userProfile.getIdentifier();
         }
-        mUserName.setText(userName);
+        mUserName.setText("欢迎"+userName+"加入房间");
     }
 
 }

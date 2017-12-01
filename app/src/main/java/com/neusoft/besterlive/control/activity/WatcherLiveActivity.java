@@ -153,13 +153,6 @@ public class WatcherLiveActivity extends AppCompatActivity {
                     }
                 },0,1000);
 
-                //调用后台接口，更新房间信息
-                JoinRoomRequest request = new JoinRoomRequest();
-                JoinRoomRequest.JoinRoomParam param = new JoinRoomRequest.JoinRoomParam();
-                param.roomId = roomId;
-                param.userId = BesterApplication.getApp().getSelfProfile().getIdentifier();
-                request.request(param);
-
                 //获取当前房间正在观看的观众信息
                 GetWatchersRequest getWatchersRequest = new GetWatchersRequest();
                 getWatchersRequest.setOnResultListener(new BaseRequest.OnResultListener<Set<String>>() {
@@ -176,6 +169,15 @@ public class WatcherLiveActivity extends AppCompatActivity {
                 GetWatchersRequest.GetWatchersParam getWatchersParam = new GetWatchersRequest.GetWatchersParam();
                 getWatchersParam.roomId = roomId;
                 getWatchersRequest.request(getWatchersParam);
+
+                //调用后台接口，更新房间信息
+                JoinRoomRequest request = new JoinRoomRequest();
+                JoinRoomRequest.JoinRoomParam param = new JoinRoomRequest.JoinRoomParam();
+                param.roomId = roomId;
+                param.userId = BesterApplication.getApp().getSelfProfile().getIdentifier();
+                request.request(param);
+
+                //开启心跳包检
                 BesterApplication.getApp().startHeartBeat(roomId);
             }
 
@@ -183,7 +185,7 @@ public class WatcherLiveActivity extends AppCompatActivity {
             public void onError(String module, int errCode, String errMsg) {
                 //加入房间失败
                 Toast.makeText(WatcherLiveActivity.this, "加入房间失败", Toast.LENGTH_SHORT).show();
-                quitRoom(false);
+                finish();
             }
         });
     }
@@ -353,7 +355,6 @@ public class WatcherLiveActivity extends AppCompatActivity {
             public void onCloseClick() {
                 //点击关闭直播
                 quitRoom(false);
-                finish();
             }
 
             @Override
@@ -535,20 +536,22 @@ public class WatcherLiveActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         ILVLiveManager.getInstance().onPause();
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         ILVLiveManager.getInstance().onResume();
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         //避免内存泄漏
-        heartTimer.cancel();
         quitRoom(false);
+        heartTimer.cancel();
     }
 
     //退出房间
@@ -558,30 +561,23 @@ public class WatcherLiveActivity extends AppCompatActivity {
         customCmd.setType(ILVText.ILVTextType.eGroupMsg);
         customCmd.setCmd(ILVLiveConstants.ILVLIVE_CMD_LEAVE);
         customCmd.setDestId(ILiveRoomManager.getInstance().getIMGroupId());
-        ILVLiveManager.getInstance().sendCustomCmd(customCmd, new ILiveCallBack() {
+        ILVLiveManager.getInstance().sendCustomCmd(customCmd, new ILiveCallBack(){
             @Override
             public void onSuccess(Object data) {
                 ILVLiveManager.getInstance().quitRoom(new ILiveCallBack() {
                     @Override
                     public void onSuccess(Object data) {
                         if (fromHost){
-                            Toast.makeText(WatcherLiveActivity.this, "该主播已结束直播，自动退出房间！", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(WatcherLiveActivity.this, "当前直播已关闭，自动退出房间", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(WatcherLiveActivity.this, "退出房间成功", Toast.LENGTH_SHORT).show();
                         }
-                        //调用后台接口，更新房间信息
-                        QuitRoomRequest request = new QuitRoomRequest();
-                        QuitRoomRequest.QuitRoomParam param = new QuitRoomRequest.QuitRoomParam();
-                        param.roomId = roomId;
-                        param.userId = BesterApplication.getApp().getSelfProfile().getIdentifier();
-                        request.request(param);
-
-                        BesterApplication.getApp().stopHeartBeat();
+                        finish();
                     }
 
                     @Override
                     public void onError(String module, int errCode, String errMsg) {
-                        Toast.makeText(WatcherLiveActivity.this, "退出房间失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(WatcherLiveActivity.this, "退出房间失败:" + errMsg, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -591,6 +587,13 @@ public class WatcherLiveActivity extends AppCompatActivity {
 
             }
         });
+        //异常退出，调用后台接口，更新房间信息
+        QuitRoomRequest request = new QuitRoomRequest();
+        QuitRoomRequest.QuitRoomParam param = new QuitRoomRequest.QuitRoomParam();
+        param.roomId = roomId;
+        param.userId = BesterApplication.getApp().getSelfProfile().getIdentifier();
+        request.request(param);
+        BesterApplication.getApp().stopHeartBeat();
     }
 
     // 保存更新信息
