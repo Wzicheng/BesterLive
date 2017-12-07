@@ -8,7 +8,8 @@ import com.neusoft.besterlive.utils.BaseRequest;
  */
 
 public class GetWatchersRequest extends BaseRequest {
-    private static final String host = "http://besterlive.butterfly.mopaasapp.com/roomServlet?action=getWatchers&";
+//    private static final String host = "http://besterlive.butterfly.mopaasapp.com/roomServlet?action=getWatchers&";
+    private static final String host = "http://39.108.8.161/BesterLive/roomServlet?action=getWatchers&";
 
     public static class GetWatchersParam{
         public int roomId;

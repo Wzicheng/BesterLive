@@ -7,7 +7,8 @@ import com.neusoft.besterlive.utils.BaseRequest;
  */
 
 public class HeartBeatRequest extends BaseRequest {
-    private static final String host = "http://besterlive.butterfly.mopaasapp.com/roomServlet?action=heartBeat&";
+//    private static final String host = "http://besterlive.butterfly.mopaasapp.com/roomServlet?action=heartBeat&";
+    private static final String host = "http://39.108.8.161/BesterLive/roomServlet?action=heartBeat&";
 
     public static class HeartBeatParam{
         public String userId;

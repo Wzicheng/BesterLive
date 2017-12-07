@@ -8,7 +8,8 @@ import com.neusoft.besterlive.utils.BaseRequest;
  */
 
 public class SendGiftRequest extends BaseRequest {
-    private static final String host = "http://besterlive.butterfly.mopaasapp.com/userServlet?action=sendGift&";
+//    private static final String host = "http://besterlive.butterfly.mopaasapp.com/userServlet?action=sendGift&";
+    private static final String host = "http://39.108.8.161/BesterLive/userServlet?action=sendGift&";
 
     public static class SendGiftParam{
         public String userId;

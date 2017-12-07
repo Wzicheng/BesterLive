@@ -7,7 +7,8 @@ import com.neusoft.besterlive.utils.BaseRequest;
  */
 
 public class QuitRoomRequest extends BaseRequest {
-    private static final String host = "http://besterlive.butterfly.mopaasapp.com/roomServlet?action=quitRoom&";
+//    private static final String host = "http://besterlive.butterfly.mopaasapp.com/roomServlet?action=quitRoom&";
+    private static final String host = "http://39.108.8.161/BesterLive/roomServlet?action=quitRoom&";
 
     public static class QuitRoomParam{
         public String userId;

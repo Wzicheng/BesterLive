@@ -202,10 +202,10 @@ public class HostLiveActivity extends AppCompatActivity {
                             mHeartLayout.addHeart(getRandomColor());
                         } else if (giftInfo.type == GiftInfo.Type.ContinueGift) {
                             getGift(giftInfo);
-                            mGiftRepeateView.showGiftMsg(giftInfo, cmdInfo.repeatId, BesterApplication.getApp().getSelfProfile());
+                            mGiftRepeateView.showGiftMsg(giftInfo, cmdInfo.repeatId, userProfile);
                         } else if (giftInfo.type == GiftInfo.Type.FullScreenGift) {
                             getGift(giftInfo);
-                            mGiftFullView.showGift(giftInfo, BesterApplication.getApp().getSelfProfile());
+                            mGiftFullView.showGift(giftInfo, userProfile);
                         }
                         break;
                     case ILVLiveConstants.ILVLIVE_CMD_ENTER:

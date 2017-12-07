@@ -7,7 +7,8 @@ import com.neusoft.besterlive.utils.BaseRequest;
  */
 
 public class JoinRoomRequest extends BaseRequest {
-    private static final String host = "http://besterlive.butterfly.mopaasapp.com/roomServlet?action=joinRoom&";
+//    private static final String host = "http://besterlive.butterfly.mopaasapp.com/roomServlet?action=joinRoom&";
+    private static final String host = "http://39.108.8.161/BesterLive/roomServlet?action=joinRoom&";
 
     public static class JoinRoomParam{
         public String userId;
